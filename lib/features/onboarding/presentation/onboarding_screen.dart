@@ -139,8 +139,10 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   text: 'Get Started',
                   onPressed: () async {
                     await controller.completeOnboarding();
-                    Navigator.of(context)
-                        .pushReplacementNamed(InitialRoutes.loginRoute);
+                    if (mounted) {
+                      Navigator.of(context)
+                          .pushReplacementNamed(InitialRoutes.loginRoute);
+                    }
                   },
                   textColor: secondaryColor,
                   textFontWeight: FontWeight.w600,

@@ -1,3 +1,4 @@
+import 'package:daily_weight_logs_mobile/features/authentication/presentation/forgot_password.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/presentation/login_screen.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/presentation/register_screen.dart';
 import 'package:daily_weight_logs_mobile/features/not_found/presentation/not_found_screen.dart';
@@ -18,6 +19,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case InitialRoutes.registerRoute:
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
+      case InitialRoutes.forgotPasswordRoute:
+        return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
 
       // Undefined routes
       default:

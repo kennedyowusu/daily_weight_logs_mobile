@@ -27,7 +27,7 @@ class WeightLogButtonText extends StatelessWidget {
           text: mainText,
           fontSize: mainTextStyle?.fontSize ?? 14,
           fontWeight: mainTextStyle?.fontWeight ?? FontWeight.normal,
-          color: mainTextStyle?.color ?? Colors.black,
+          color: mainTextStyle?.color ?? secondaryColor,
         ),
         InkWell(
           onTap: () {

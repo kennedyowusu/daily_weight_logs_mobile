@@ -9,30 +9,35 @@ class WeightLogText extends StatelessWidget {
   final double height;
   final TextAlign textAlign;
   final TextOverflow overflow;
+  final VoidCallback? onPressed;
 
   const WeightLogText({
     required this.text,
     this.fontSize = 14,
-    this.fontWeight = FontWeight.normal,
+    this.fontWeight = FontWeight.w600,
     this.color = secondaryColor,
     this.textAlign = TextAlign.left,
     this.overflow = TextOverflow.clip,
     super.key,
     this.height = 1.2,
+    this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: fontSize,
-        fontWeight: fontWeight,
-        color: color,
-        height: height,
+    return GestureDetector(
+      onTap: onPressed,
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          color: color,
+          height: height,
+        ),
+        textAlign: textAlign,
+        overflow: overflow,
       ),
-      textAlign: textAlign,
-      overflow: overflow,
     );
   }
 }

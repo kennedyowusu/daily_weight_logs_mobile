@@ -83,4 +83,41 @@ class AuthRepository {
       );
     }
   }
+
+  Future<(ApiSuccess<AuthApiResponse>?, ApiError?)> forgotPassword(
+      String email) async {
+    try {
+      final response = await dio.post(
+        '/api/v1/forgot-password',
+        data: {'email': email},
+      );
+
+      if (response.statusCode == 200) {
+        final authResponse = AuthApiResponse.fromJson(response.data);
+        return (
+          ApiSuccess<AuthApiResponse>(
+            statusCode: response.statusCode!,
+            data: authResponse,
+          ),
+          null
+        );
+      } else {
+        return (
+          null,
+          ApiError(
+            statusCode: response.statusCode!,
+            message: errorParser(response.data),
+          )
+        );
+      }
+    } catch (e) {
+      return (
+        null,
+        ApiError(
+          statusCode: 500,
+          message: 'Error during forgot password',
+        )
+      );
+    }
+  }
 }

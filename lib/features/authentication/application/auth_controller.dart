@@ -67,6 +67,20 @@ class AuthController extends StateNotifier<AsyncValue<AuthApiResponse?>> {
       state = AsyncValue.error(err.message, StackTrace.current);
     }
   }
+
+  Future<void> forgotPassword(String email) async {
+    state = const AsyncLoading();
+    final (ApiSuccess<AuthApiResponse>? res, ApiError? err) =
+        await repository.forgotPassword(email);
+
+    if (res != null) {
+      // Set state to successful response
+      state = AsyncValue.data(res.data);
+    } else if (err != null) {
+      // Set state to error
+      state = AsyncValue.error(err.message, StackTrace.current);
+    }
+  }
 }
 
 final authControllerProvider =
