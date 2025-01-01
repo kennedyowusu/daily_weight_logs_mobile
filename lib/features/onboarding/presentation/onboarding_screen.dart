@@ -3,7 +3,7 @@ import 'package:daily_weight_logs_mobile/common/constants/images.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text_button.dart';
 import 'package:daily_weight_logs_mobile/features/onboarding/application/onboarding_controller.dart';
 import 'package:daily_weight_logs_mobile/features/onboarding/presentation/onboarding_slide.dart';
-import 'package:daily_weight_logs_mobile/router/initial_routes.dart';
+import 'package:daily_weight_logs_mobile/router/unauthenticated_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

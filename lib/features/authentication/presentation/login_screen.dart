@@ -1,11 +1,13 @@
 import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/constants/images.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_button.dart';
+import 'package:daily_weight_logs_mobile/common/widgets/weight_log_loading_dialog.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/application/auth_controller.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/widgets/weight_log_button_text.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/widgets/weight_log_input_field.dart';
-import 'package:daily_weight_logs_mobile/router/initial_routes.dart';
+import 'package:daily_weight_logs_mobile/router/unauthenticated_routes.dart';
+import 'package:daily_weight_logs_mobile/router/authenticated_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,7 +24,7 @@ class LoginScreen extends ConsumerWidget {
           if (authResponse != null && authResponse.token != null) {
             return Center(child: Text('Welcome, ${authResponse.user?.name}!'));
           }
-          return LoginForm();
+          return const LoginForm();
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
@@ -31,15 +33,20 @@ class LoginScreen extends ConsumerWidget {
   }
 }
 
-class LoginForm extends ConsumerWidget {
+class LoginForm extends ConsumerStatefulWidget {
+  const LoginForm({super.key});
+
+  @override
+  LoginFormState createState() => LoginFormState();
+}
+
+class LoginFormState extends ConsumerState<LoginForm> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  LoginForm({super.key});
-
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Form(
@@ -112,6 +119,20 @@ class LoginForm extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             // Login Button
+            // WeightLogButton(
+            //   text: 'Login to your Account',
+            //   buttonTextColor: Colors.white,
+            //   isEnabled: true,
+            //   key: const Key('login_button'),
+            //   onPressed: () async {
+            //     if (formKey.currentState?.validate() == true) {
+            //       await ref.read(authControllerProvider.notifier).login(
+            //             emailController.text.trim(),
+            //             passwordController.text.trim(),
+            //           );
+            //     }
+            //   },
+            // ),
             WeightLogButton(
               text: 'Login to your Account',
               buttonTextColor: Colors.white,
@@ -119,13 +140,32 @@ class LoginForm extends ConsumerWidget {
               key: const Key('login_button'),
               onPressed: () async {
                 if (formKey.currentState?.validate() == true) {
-                  await ref.read(authControllerProvider.notifier).login(
-                        emailController.text.trim(),
-                        passwordController.text.trim(),
-                      );
+                  // Show loading dialog
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    barrierColor: Colors.black.withOpacity(0.5),
+                    useSafeArea: true,
+                    builder: (BuildContext context) {
+                      return const WeightLogLoadingDialog(
+                          message: 'Logging in...');
+                    },
+                  );
+
+                  // Simulate login process
+                  await Future.delayed(
+                    const Duration(seconds: 2),
+                  );
+
+                  // Dismiss the dialog after login completes
+                  if (mounted) Navigator.of(context).pop();
+
+                  Navigator.pushReplacementNamed(
+                      context, MainRoutes.heightLogRoute);
                 }
               },
             ),
+
             const SizedBox(height: 16),
             const WeightLogButtonText(
               mainText: 'Don\'t have an account? ',
