@@ -28,7 +28,7 @@ class WeightLogButton extends StatelessWidget {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         fixedSize: Size(MediaQuery.sizeOf(context).width, 53),
-        backgroundColor: isEnabled ? primaryColor : const Color(0xFFD8D8D8),
+        backgroundColor: isEnabled ? secondaryColor : const Color(0xFFD8D8D8),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),

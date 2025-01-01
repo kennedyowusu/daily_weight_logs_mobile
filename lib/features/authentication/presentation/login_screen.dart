@@ -1,5 +1,8 @@
-import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
+import 'package:daily_weight_logs_mobile/common/constants/images.dart';
+import 'package:daily_weight_logs_mobile/common/widgets/weight_log_button.dart';
+import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/application/auth_controller.dart';
+import 'package:daily_weight_logs_mobile/features/authentication/widgets/weight_log_button_text.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/widgets/weight_log_input_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,8 +43,22 @@ class LoginForm extends ConsumerWidget {
       child: Form(
         key: formKey,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            SizedBox(height: MediaQuery.sizeOf(context).height * 0.1),
+            const WeightLogText(
+              text: 'Welcome back!',
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+            SizedBox(height: MediaQuery.sizeOf(context).height * 0.05),
+            Image.asset(
+              weightLogoPng,
+              width: 150,
+              height: 150,
+            ),
+            SizedBox(height: MediaQuery.sizeOf(context).height * 0.14),
+
             // Email Field
             WeightLogInputField(
               controller: emailController,
@@ -78,7 +95,11 @@ class LoginForm extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             // Login Button
-            ElevatedButton(
+            WeightLogButton(
+              text: 'Login to your Account',
+              buttonTextColor: Colors.white,
+              isEnabled: true,
+              key: const Key('login_button'),
               onPressed: () async {
                 if (formKey.currentState?.validate() == true) {
                   await ref.read(authControllerProvider.notifier).login(
@@ -87,21 +108,12 @@ class LoginForm extends ConsumerWidget {
                       );
                 }
               },
-              style: ElevatedButton.styleFrom(
-                fixedSize: Size(MediaQuery.of(context).size.width, 53),
-                backgroundColor: secondaryColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text(
-                'Login to your account',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            ),
+            const SizedBox(height: 16),
+            const WeightLogButtonText(
+              mainText: 'Don\'t have an account? ',
+              actionText: 'Sign up',
+              route: '/register',
             ),
           ],
         ),
