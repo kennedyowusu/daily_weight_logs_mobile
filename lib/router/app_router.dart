@@ -1,7 +1,7 @@
 import 'package:daily_weight_logs_mobile/features/authentication/presentation/forgot_password.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/presentation/login_screen.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/presentation/register_screen.dart';
-import 'package:daily_weight_logs_mobile/features/height_logs/presentation/height_log.dart';
+import 'package:daily_weight_logs_mobile/features/height_logs/presentation/height_log_screen.dart';
 import 'package:daily_weight_logs_mobile/features/not_found/presentation/not_found_screen.dart';
 import 'package:daily_weight_logs_mobile/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:daily_weight_logs_mobile/features/weight_logs/presentation/weight_log_screen.dart';

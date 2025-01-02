@@ -1,10 +1,12 @@
+import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/constants/images.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_app_bar.dart';
-import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
-import 'package:flutter/material.dart';
-import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_button.dart';
+import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/widgets/weight_log_input_field.dart';
+import 'package:daily_weight_logs_mobile/features/height_logs/application/controllers/height_log_controller.dart';
+import 'package:daily_weight_logs_mobile/features/height_logs/data/repositories/height_log_repository.dart';
+import 'package:flutter/material.dart';
 
 class HeightLogScreen extends StatefulWidget {
   const HeightLogScreen({super.key});
@@ -17,11 +19,13 @@ class _HeightLogScreenState extends State<HeightLogScreen> {
   final TextEditingController heightController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   String? selectedWeightGoal;
+  final HeightLogController controller = HeightLogController(
+    repository: HeightLogRepository(),
+  );
 
   final List<String> weightGoals = ['gain', 'lose', 'maintain'];
 
   void _showWeightGoalSelection(BuildContext context) async {
-    // Delay the display of the modal bottom sheet
     await Future.delayed(const Duration(milliseconds: 100));
 
     showModalBottomSheet(
@@ -44,7 +48,6 @@ class _HeightLogScreenState extends State<HeightLogScreen> {
           ),
           child: Column(
             children: [
-              // Add the header text
               const Padding(
                 padding: EdgeInsets.only(bottom: 1.0),
                 child: WeightLogText(
@@ -54,7 +57,6 @@ class _HeightLogScreenState extends State<HeightLogScreen> {
                 ),
               ),
               const Divider(),
-              // List of weight goals
               ListView.separated(
                 shrinkWrap: true,
                 itemCount: weightGoals.length,
@@ -63,7 +65,6 @@ class _HeightLogScreenState extends State<HeightLogScreen> {
                 },
                 itemBuilder: (BuildContext context, int index) {
                   final isSelected = selectedWeightGoal == weightGoals[index];
-
                   return ListTile(
                     leading: Icon(
                       Icons.check_circle_sharp,
@@ -182,10 +183,12 @@ class _HeightLogScreenState extends State<HeightLogScreen> {
                   buttonTextFontWeight: FontWeight.w600,
                   key: const Key('submit_button'),
                   isEnabled: true,
-                  onPressed: () {
-                    if (formKey.currentState?.validate() == true) {
-                      final height = heightController.text.trim();
-                      final weightGoal = selectedWeightGoal;
+                  onPressed: () async {
+                    if (formKey.currentState?.validate() == true &&
+                        selectedWeightGoal != null) {
+                      final height = double.parse(heightController.text.trim());
+                      final weightGoal = selectedWeightGoal!;
+                      await controller.submitHeightLog(height, weightGoal);
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
