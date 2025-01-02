@@ -26,10 +26,11 @@ class _HeightLogScreenState extends State<HeightLogScreen> {
 
   final List<String> weightGoals = ['gain', 'lose', 'maintain'];
 
-  void _showWeightGoalSelection(BuildContext context) async {
-    // Delay the display of the modal bottom sheet
-    await Future.delayed(const Duration(milliseconds: 100));
+  // For unit selection
+  String selectedUnit = 'meters'; // Default unit
 
+  void _showWeightGoalSelection(BuildContext context) async {
+    await Future.delayed(const Duration(milliseconds: 100));
     showModalBottomSheet(
       context: context,
       useSafeArea: true,
@@ -51,6 +52,42 @@ class _HeightLogScreenState extends State<HeightLogScreen> {
         );
       },
     );
+  }
+
+  void _convertHeightIfNeeded() {
+    if (selectedUnit != 'meters') {
+      try {
+        final String input = heightController.text.trim();
+        if (input.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please enter your height.')),
+          );
+          return;
+        }
+
+        double meters;
+        if (selectedUnit == 'centimeters') {
+          meters = controller.convertToMeters(input);
+        } else if (selectedUnit == 'feet/inches') {
+          meters = controller.convertToMeters(input, isUsingFeet: true);
+        } else {
+          throw const FormatException('Invalid unit selected.');
+        }
+
+        if (meters < 1.0 || meters > 2.5) {
+          throw const FormatException(
+              'Height in meters must be between 1.0 and 2.5.');
+        }
+
+        heightController.text = meters.toStringAsFixed(2);
+
+        debugPrint('Converted height: $meters');
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Invalid input: $e')),
+        );
+      }
+    }
   }
 
   @override
@@ -81,25 +118,83 @@ class _HeightLogScreenState extends State<HeightLogScreen> {
                   height: 150,
                 ),
                 SizedBox(height: MediaQuery.sizeOf(context).height * 0.14),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: WeightLogText(
+                    text: 'Select Height Unit:',
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: RadioListTile<String>(
+                        title: const WeightLogText(
+                          text: 'm',
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                        value: 'meters',
+                        groupValue: selectedUnit,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedUnit = value!;
+                            heightController.clear();
+                          });
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: RadioListTile<String>(
+                        title: const WeightLogText(
+                          text: 'cm',
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                        value: 'centimeters',
+                        groupValue: selectedUnit,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedUnit = value!;
+                            heightController.clear();
+                          });
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: RadioListTile<String>(
+                        title: const WeightLogText(
+                          text: 'ft/in',
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                        value: 'feet/inches',
+                        groupValue: selectedUnit,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedUnit = value!;
+                            heightController.clear();
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
                 WeightLogInputField(
                   controller: heightController,
-                  hintText: 'Enter your height (meters)',
-                  labelText: 'Height',
+                  hintText: selectedUnit == 'meters'
+                      ? 'Enter height in meters'
+                      : selectedUnit == 'centimeters'
+                          ? 'Enter height in centimeters'
+                          : 'Enter height in feet.inches',
+                  labelText:
+                      'Height (${selectedUnit == "feet/inches" ? "ft.in" : selectedUnit})',
                   inputTextColor: Colors.white,
                   keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.next,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your height';
-                    }
-                    final height = double.tryParse(value);
-                    if (height == null || height < 1.0 || height > 2.5) {
-                      return 'Height must be between 1 and 2.5 meters';
-                    }
-                    return null;
-                  },
+                  textInputAction: TextInputAction.done,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 DropdownButtonHideUnderline(
                   child: GestureDetector(
                     onTap: () {
@@ -140,13 +235,19 @@ class _HeightLogScreenState extends State<HeightLogScreen> {
                   text: 'Submit Height Goal',
                   buttonTextColor: secondaryColor,
                   buttonBackgroundColor: primaryColor,
-                  buttonTextFontWeight: FontWeight.w600,
-                  key: const Key('submit_button'),
-                  isEnabled: true,
                   onPressed: () async {
+                    _convertHeightIfNeeded(); // Convert height before submission
                     if (formKey.currentState?.validate() == true &&
                         selectedWeightGoal != null) {
-                      final height = double.parse(heightController.text.trim());
+                      final height =
+                          double.tryParse(heightController.text.trim());
+                      if (height == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Invalid height value.')),
+                        );
+                        return;
+                      }
                       final weightGoal = selectedWeightGoal!;
                       await controller.submitHeightLog(height, weightGoal);
 
