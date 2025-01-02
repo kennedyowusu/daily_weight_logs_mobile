@@ -7,6 +7,7 @@ import 'package:daily_weight_logs_mobile/features/authentication/widgets/weight_
 import 'package:daily_weight_logs_mobile/features/height_logs/application/controllers/height_log_controller.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/data/repositories/height_log_repository.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/presentation/widgets/weight_goal_selection_modal.dart';
+import 'package:daily_weight_logs_mobile/router/authenticated_routes.dart';
 import 'package:flutter/material.dart';
 
 class HeightLogScreen extends StatefulWidget {
@@ -257,6 +258,11 @@ class _HeightLogScreenState extends State<HeightLogScreen> {
                             'Height: $height, Weight Goal: $weightGoal',
                           ),
                         ),
+                      );
+
+                      Navigator.pushReplacementNamed(
+                        context,
+                        MainRoutes.weightLogRoute,
                       );
                     }
                   },
