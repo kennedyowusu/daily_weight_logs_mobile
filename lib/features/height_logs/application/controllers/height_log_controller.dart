@@ -1,17 +1,47 @@
 import 'package:daily_weight_logs_mobile/features/height_logs/data/repositories/height_log_repository.dart';
+import 'package:daily_weight_logs_mobile/features/height_logs/domain/models/height_log_model.dart';
+import 'package:dio/dio.dart';
 
-class HeightLogController {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+class HeightLogController extends StateNotifier<AsyncValue<HeightLog?>> {
   final HeightLogRepository repository;
 
-  HeightLogController({required this.repository});
+  HeightLogController(this.repository) : super(const AsyncData(null));
 
-  Future<void> submitHeightLog(double height, String weightGoal) async {
-    await repository.saveHeightLog(height, weightGoal);
+  Future<void> fetchHeightLogs() async {
+    state = const AsyncLoading();
+
+    final (apiResponse, errorMessage) = await repository.fetchHeightLogs();
+    if (apiResponse != null) {
+      state = AsyncValue.data(apiResponse.data);
+    } else {
+      state =
+          AsyncValue.error(errorMessage ?? 'Unknown error', StackTrace.current);
+    }
+  }
+
+  Future<void> saveHeightLog(double height, String weightGoal) async {
+    state = const AsyncLoading();
+
+    final newHeightLog = HeightLog(
+      height: height.toString(),
+      weightGoal: weightGoal,
+    );
+
+    final (apiResponse, errorMessage) =
+        await repository.saveHeightLog(newHeightLog);
+
+    if (apiResponse != null) {
+      state = AsyncValue.data(apiResponse.data);
+    } else {
+      state =
+          AsyncValue.error(errorMessage ?? 'Unknown error', StackTrace.current);
+    }
   }
 
   double convertToMeters(String input, {bool isUsingFeet = false}) {
     if (isUsingFeet) {
-      // Parse feet and inches input
       final parts = input.split('.');
       if (parts.isEmpty || parts.length > 2) {
         throw const FormatException('Invalid format for feet and inches.');
@@ -20,10 +50,8 @@ class HeightLogController {
       final feet = double.tryParse(parts[0]) ?? 0.0;
       final inches = parts.length == 2 ? double.tryParse(parts[1]) ?? 0.0 : 0.0;
 
-      // Convert to meters: 1 foot = 0.3048 meters, 1 inch = 0.0254 meters
       return (feet * 0.3048) + (inches * 0.0254);
     } else {
-      // Convert from centimeters to meters: 1 cm = 0.01 meters
       final centimeters = double.tryParse(input);
       if (centimeters == null) {
         throw const FormatException('Invalid format for centimeters.');
@@ -32,3 +60,8 @@ class HeightLogController {
     }
   }
 }
+
+final heightLogControllerProvider =
+    StateNotifierProvider<HeightLogController, AsyncValue<HeightLog?>>(
+  (ref) => HeightLogController(HeightLogRepository(Dio())),
+);

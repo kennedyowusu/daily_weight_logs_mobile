@@ -2,10 +2,10 @@ import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/constants/images.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_app_bar.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_button.dart';
+import 'package:daily_weight_logs_mobile/common/widgets/weight_log_loading_dialog.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/widgets/weight_log_input_field.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/application/controllers/height_log_controller.dart';
-import 'package:daily_weight_logs_mobile/features/height_logs/data/repositories/height_log_repository.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/presentation/widgets/weight_goal_selection_modal.dart';
 import 'package:daily_weight_logs_mobile/router/authenticated_routes.dart';
 import 'package:flutter/material.dart';
@@ -22,9 +22,6 @@ class _HeightLogScreenState extends ConsumerState<HeightLogScreen> {
   final TextEditingController heightController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   String? selectedWeightGoal;
-  final HeightLogController controller = HeightLogController(
-    repository: HeightLogRepository(),
-  );
 
   final List<String> weightGoals = ['gain', 'lose', 'maintain'];
 
@@ -69,9 +66,13 @@ class _HeightLogScreenState extends ConsumerState<HeightLogScreen> {
 
         double meters;
         if (selectedUnit == 'centimeters') {
-          meters = controller.convertToMeters(input);
+          meters = ref
+              .read(heightLogControllerProvider.notifier)
+              .convertToMeters(input);
         } else if (selectedUnit == 'feet/inches') {
-          meters = controller.convertToMeters(input, isUsingFeet: true);
+          meters = ref
+              .read(heightLogControllerProvider.notifier)
+              .convertToMeters(input, isUsingFeet: true);
         } else {
           throw const FormatException('Invalid unit selected.');
         }
@@ -82,8 +83,6 @@ class _HeightLogScreenState extends ConsumerState<HeightLogScreen> {
         }
 
         heightController.text = meters.toStringAsFixed(2);
-
-        debugPrint('Converted height: $meters');
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Invalid input: $e')),
@@ -94,6 +93,8 @@ class _HeightLogScreenState extends ConsumerState<HeightLogScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final heightLogState = ref.watch(heightLogControllerProvider);
+
     return Scaffold(
       backgroundColor: secondaryColor,
       appBar: const PreferredSize(
@@ -238,7 +239,7 @@ class _HeightLogScreenState extends ConsumerState<HeightLogScreen> {
                   buttonTextColor: secondaryColor,
                   buttonBackgroundColor: primaryColor,
                   onPressed: () async {
-                    _convertHeightIfNeeded(); // Convert height before submission
+                    _convertHeightIfNeeded();
                     if (formKey.currentState?.validate() == true &&
                         selectedWeightGoal != null) {
                       final height =
@@ -250,20 +251,39 @@ class _HeightLogScreenState extends ConsumerState<HeightLogScreen> {
                         );
                         return;
                       }
-                      final weightGoal = selectedWeightGoal!;
-                      await controller.submitHeightLog(height, weightGoal);
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Height: $height, Weight Goal: $weightGoal',
-                          ),
-                        ),
+                      // Show loading dialog
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        barrierColor: Colors.black.withOpacity(0.5),
+                        builder: (BuildContext context) {
+                          return const WeightLogLoadingDialog(
+                              message: 'Submitting...');
+                        },
                       );
 
-                      Navigator.pushReplacementNamed(
-                        context,
-                        MainRoutes.weightLogRoute,
+                      await ref
+                          .read(heightLogControllerProvider.notifier)
+                          .saveHeightLog(height, selectedWeightGoal!);
+
+                      heightLogState.when(
+                        data: (_) {
+                          Navigator.of(context).pop();
+                          Navigator.pushReplacementNamed(
+                            context,
+                            MainRoutes.weightLogRoute,
+                          );
+                        },
+                        error: (error, _) {
+                          Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(error.toString())),
+                          );
+                        },
+                        loading: () {
+                          // Already handled by dialog
+                        },
                       );
                     }
                   },
