@@ -6,6 +6,7 @@ import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/widgets/weight_log_input_field.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/application/controllers/height_log_controller.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/data/repositories/height_log_repository.dart';
+import 'package:daily_weight_logs_mobile/features/height_logs/presentation/widgets/weight_goal_selection_modal.dart';
 import 'package:flutter/material.dart';
 
 class HeightLogScreen extends StatefulWidget {
@@ -26,15 +27,12 @@ class _HeightLogScreenState extends State<HeightLogScreen> {
   final List<String> weightGoals = ['gain', 'lose', 'maintain'];
 
   void _showWeightGoalSelection(BuildContext context) async {
+    // Delay the display of the modal bottom sheet
     await Future.delayed(const Duration(milliseconds: 100));
 
     showModalBottomSheet(
       context: context,
       useSafeArea: true,
-      transitionAnimationController: AnimationController(
-        vsync: Navigator.of(context),
-        duration: const Duration(milliseconds: 300),
-      ),
       isDismissible: true,
       isScrollControlled: true,
       showDragHandle: true,
@@ -42,52 +40,14 @@ class _HeightLogScreenState extends State<HeightLogScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (BuildContext context) {
-        return Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.3,
-          ),
-          child: Column(
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(bottom: 1.0),
-                child: WeightLogText(
-                  text: 'What is your weight goal?',
-                  fontSize: 18,
-                  color: secondaryColor,
-                ),
-              ),
-              const Divider(),
-              ListView.separated(
-                shrinkWrap: true,
-                itemCount: weightGoals.length,
-                separatorBuilder: (BuildContext context, int index) {
-                  return const Divider();
-                },
-                itemBuilder: (BuildContext context, int index) {
-                  final isSelected = selectedWeightGoal == weightGoals[index];
-                  return ListTile(
-                    leading: Icon(
-                      Icons.check_circle_sharp,
-                      color: isSelected ? primaryColor : grayTextColor,
-                      size: 24,
-                    ),
-                    title: WeightLogText(
-                      text: weightGoals[index],
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: isSelected ? primaryColor : secondaryColor,
-                    ),
-                    onTap: () {
-                      setState(() {
-                        selectedWeightGoal = weightGoals[index];
-                      });
-                      Navigator.pop(context);
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
+        return WeightGoalSelectionModal(
+          weightGoals: weightGoals,
+          selectedWeightGoal: selectedWeightGoal,
+          onSelected: (String goal) {
+            setState(() {
+              selectedWeightGoal = goal;
+            });
+          },
         );
       },
     );
