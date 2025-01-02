@@ -1,6 +1,7 @@
 import 'package:daily_weight_logs_mobile/common/constants/app_key.dart';
 import 'package:daily_weight_logs_mobile/common/constants/endpoints.dart';
 import 'package:daily_weight_logs_mobile/common/utils/error_parser.dart';
+import 'package:daily_weight_logs_mobile/common/utils/retry_interceptor.dart';
 import 'package:daily_weight_logs_mobile/common/utils/secure_storage.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/presentation/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,25 @@ class APIService {
       },
     ),
   );
+
+  static void initializeInterceptors() {
+    _dio.interceptors.add(
+      RetryInterceptor(
+        dio: _dio,
+        defaultMaxRetries: 3,
+        defaultRetryDelayMilliseconds: 1000,
+      ),
+    );
+
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onError: (DioException error, ErrorInterceptorHandler handler) async {
+          await _logoutUserOn401Error(error);
+          return handler.next(error);
+        },
+      ),
+    );
+  }
 
   static Future<void> _logoutUserOn401Error(DioException error) async {
     if (error.response?.statusCode == 401 &&

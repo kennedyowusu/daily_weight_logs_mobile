@@ -4,12 +4,15 @@ import 'package:daily_weight_logs_mobile/common/utils/theme.dart';
 import 'package:daily_weight_logs_mobile/features/not_found/presentation/not_found_screen.dart';
 import 'package:daily_weight_logs_mobile/router/app_router.dart';
 import 'package:daily_weight_logs_mobile/router/unauthenticated_routes.dart';
+import 'package:daily_weight_logs_mobile/services/api_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+    APIService.initializeInterceptors();
+
   final storage = DailyWeightLogsSecureStorage();
   final isOnboardingCompleted = await storage.isUserSeenOnboarding();
 

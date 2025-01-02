@@ -16,18 +16,13 @@ class LoginScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authControllerProvider);
-
-    return Scaffold(
-      body: authState.when(
-        data: (authResponse) {
-          if (authResponse != null && authResponse.token != null) {
-            return Center(child: Text('Welcome, ${authResponse.user?.name}!'));
-          }
-          return const LoginForm();
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+    return const Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            LoginForm(),
+          ],
+        ),
       ),
     );
   }
@@ -124,21 +119,7 @@ class LoginFormState extends ConsumerState<LoginForm> {
               ),
             ),
             const SizedBox(height: 24),
-            // Login Button
-            // WeightLogButton(
-            //   text: 'Login to your Account',
-            //   buttonTextColor: Colors.white,
-            //   isEnabled: true,
-            //   key: const Key('login_button'),
-            //   onPressed: () async {
-            //     if (formKey.currentState?.validate() == true) {
-            //       await ref.read(authControllerProvider.notifier).login(
-            //             emailController.text.trim(),
-            //             passwordController.text.trim(),
-            //           );
-            //     }
-            //   },
-            // ),
+
             WeightLogButton(
               text: 'Login to your Account',
               buttonTextColor: Colors.white,
@@ -158,16 +139,50 @@ class LoginFormState extends ConsumerState<LoginForm> {
                     },
                   );
 
-                  // Simulate login process
-                  await Future.delayed(
-                    const Duration(seconds: 2),
+                  // Call login API
+                  await ref.read(authControllerProvider.notifier).login(
+                      emailController.text.trim(),
+                      passwordController.text.trim());
+
+                  // Handle login response
+                  final authState = ref.watch(authControllerProvider);
+                  authState.when(
+                    data: (response) {
+                      if (response?.token != null) {
+                        // Dismiss loading dialog
+                        Navigator.of(context).pop();
+
+                        // Navigate to the next screen
+                        Navigator.pushReplacementNamed(
+                          context,
+                          MainRoutes.heightLogRoute,
+                        );
+                      } else {
+                        // Dismiss loading dialog and show error
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                response?.message ?? 'Unknown error occurred'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    },
+                    loading: () {
+                      // Loading state is handled by the dialog
+                    },
+                    error: (error, stackTrace) {
+                      // Dismiss loading dialog and show error
+                      Navigator.of(context).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(error.toString()),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    },
                   );
-
-                  // Dismiss the dialog after login completes
-                  if (mounted) Navigator.of(context).pop();
-
-                  Navigator.pushReplacementNamed(
-                      context, MainRoutes.heightLogRoute);
                 }
               },
             ),

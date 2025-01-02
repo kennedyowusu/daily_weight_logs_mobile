@@ -1,9 +1,12 @@
+import 'dart:io';
+import 'package:daily_weight_logs_mobile/common/constants/endpoints.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/domain/auth_model.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/domain/login_auth_request.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/domain/register_auth_model.dart';
 import 'package:dio/dio.dart';
 import 'package:daily_weight_logs_mobile/common/constants/api_response.dart';
 import 'package:daily_weight_logs_mobile/common/utils/error_parser.dart';
+import 'package:flutter/material.dart';
 
 class AuthRepository {
   final Dio dio;
@@ -12,9 +15,11 @@ class AuthRepository {
 
   Future<(ApiSuccess<AuthApiResponse>?, ApiError?)> login(
       LoginAuthRequest request) async {
+    const loginUrl = baseUrl + loginWithEmailUrl;
+    debugPrint('Login URL: $loginUrl');
     try {
       final response = await dio.post(
-        '/api/v1/login',
+        loginUrl,
         data: request.toJson(),
       );
 
@@ -36,12 +41,36 @@ class AuthRepository {
           )
         );
       }
-    } catch (e) {
+    } on DioException catch (dioError) {
+      // Check if it's a socket exception
+      if (dioError.error is SocketException) {
+        debugPrint('SocketException: No internet connection');
+        return (
+          null,
+          ApiError(
+            statusCode: 500,
+            message: 'No internet connection. Please try again.',
+          )
+        );
+      }
+      // Handle other DioErrors
+      debugPrint('DioException: $dioError');
       return (
         null,
         ApiError(
           statusCode: 500,
-          message: 'Error during login',
+          message: 'An unexpected error occurred.',
+        )
+      );
+    } catch (e, stackTrace) {
+      // Log the error
+      debugPrint('Error during login: $e');
+      debugPrint('StackTrace: $stackTrace');
+      return (
+        null,
+        ApiError(
+          statusCode: 500,
+          message: 'An unexpected error occurred.',
         )
       );
     }
@@ -73,12 +102,35 @@ class AuthRepository {
           )
         );
       }
-    } catch (e) {
+    } on DioException catch (dioError) {
+      // Check if it's a socket exception
+      if (dioError.error is SocketException) {
+        debugPrint('SocketException: No internet connection');
+        return (
+          null,
+          ApiError(
+            statusCode: 500,
+            message: 'No internet connection. Please try again.',
+          )
+        );
+      }
+      // Handle other DioErrors
+      debugPrint('DioException: $dioError');
       return (
         null,
         ApiError(
           statusCode: 500,
-          message: 'Error during registration',
+          message: 'An unexpected error occurred.',
+        )
+      );
+    } catch (e, stackTrace) {
+      debugPrint('Error during registration: $e');
+      debugPrint('StackTrace: $stackTrace');
+      return (
+        null,
+        ApiError(
+          statusCode: 500,
+          message: 'An unexpected error occurred.',
         )
       );
     }
@@ -110,6 +162,27 @@ class AuthRepository {
           )
         );
       }
+    } on DioException catch (dioError) {
+      // Check if it's a socket exception
+      if (dioError.error is SocketException) {
+        debugPrint('SocketException: No internet connection');
+        return (
+          null,
+          ApiError(
+            statusCode: 500,
+            message: 'No internet connection. Please try again.',
+          )
+        );
+      }
+      // Handle other DioErrors
+      debugPrint('DioException: $dioError');
+      return (
+        null,
+        ApiError(
+          statusCode: 500,
+          message: 'An unexpected error occurred.',
+        )
+      );
     } catch (e) {
       return (
         null,

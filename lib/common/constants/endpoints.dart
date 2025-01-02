@@ -1,7 +1,7 @@
 const String baseUrl = 'http://0.0.0.0:80/api/v1';
 
 const String loginWithEmailUrl = '/login';
-const String signUpWithEmailUrl = '/signup';
+const String signUpWithEmailUrl = '/register';
 
 const String logoutUrl = '/logout';
 
