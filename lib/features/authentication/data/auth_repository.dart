@@ -78,11 +78,16 @@ class AuthRepository {
 
   Future<(ApiSuccess<AuthApiResponse>?, ApiError?)> register(
       RegisterAuthRequest request) async {
+    const registerUrl = baseUrl + signUpWithEmailUrl;
+    debugPrint('Register URL: $registerUrl');
     try {
       final response = await dio.post(
-        '/api/v1/register',
+        registerUrl,
         data: request.toJson(),
       );
+
+      debugPrint('Response: ${response.data}');
+      debugPrint('Response Status: ${response.statusCode}');
 
       if (response.statusCode == 201) {
         final authResponse = AuthApiResponse.fromJson(response.data);
@@ -103,6 +108,11 @@ class AuthRepository {
         );
       }
     } on DioException catch (dioError) {
+      debugPrint('Request URL: ${dioError.requestOptions.uri}');
+      debugPrint('Request Headers: ${dioError.requestOptions.headers}');
+      debugPrint('Request Body: ${dioError.requestOptions.data}');
+      debugPrint('DioException: $dioError');
+
       // Check if it's a socket exception
       if (dioError.error is SocketException) {
         debugPrint('SocketException: No internet connection');

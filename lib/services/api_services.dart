@@ -17,6 +17,9 @@ class APIService {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
+      validateStatus: (status) {
+        return status != null && status >= 200 && status < 500;
+      },
     ),
   );
 

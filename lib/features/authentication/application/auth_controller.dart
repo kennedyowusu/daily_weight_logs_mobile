@@ -39,9 +39,9 @@ class AuthController extends StateNotifier<AsyncValue<AuthApiResponse?>> {
     String name,
     String username,
     String email,
+    String country,
     String password,
     String passwordConfirmation,
-    String country,
   ) async {
     state = const AsyncLoading();
     final (ApiSuccess<AuthApiResponse>? res, ApiError? err) =
@@ -49,9 +49,9 @@ class AuthController extends StateNotifier<AsyncValue<AuthApiResponse?>> {
       name: name,
       username: username,
       email: email,
+      country: country,
       password: password,
       passwordConfirmation: passwordConfirmation,
-      country: country,
     ));
 
     if (res != null) {
