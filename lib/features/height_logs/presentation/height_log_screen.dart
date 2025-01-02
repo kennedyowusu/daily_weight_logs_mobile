@@ -9,15 +9,16 @@ import 'package:daily_weight_logs_mobile/features/height_logs/data/repositories/
 import 'package:daily_weight_logs_mobile/features/height_logs/presentation/widgets/weight_goal_selection_modal.dart';
 import 'package:daily_weight_logs_mobile/router/authenticated_routes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HeightLogScreen extends StatefulWidget {
+class HeightLogScreen extends ConsumerStatefulWidget {
   const HeightLogScreen({super.key});
 
   @override
-  State<HeightLogScreen> createState() => _HeightLogScreenState();
+  ConsumerState<HeightLogScreen> createState() => _HeightLogScreenState();
 }
 
-class _HeightLogScreenState extends State<HeightLogScreen> {
+class _HeightLogScreenState extends ConsumerState<HeightLogScreen> {
   final TextEditingController heightController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   String? selectedWeightGoal;
