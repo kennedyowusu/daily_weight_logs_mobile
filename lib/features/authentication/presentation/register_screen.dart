@@ -1,3 +1,4 @@
+import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/constants/images.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_button.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
@@ -69,8 +70,11 @@ class RegisterForm extends ConsumerWidget {
               // Name Field
               WeightLogInputField(
                 controller: nameController,
+                textInputAction: TextInputAction.next,
+                keyboardType: TextInputType.text,
                 hintText: 'Enter your full name',
                 labelText: 'Full Name',
+                inputTextColor: secondaryColor,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your name';
@@ -83,8 +87,11 @@ class RegisterForm extends ConsumerWidget {
               // Username Field
               WeightLogInputField(
                 controller: usernameController,
+                textInputAction: TextInputAction.next,
+                keyboardType: TextInputType.text,
                 hintText: 'Enter your username',
                 labelText: 'Username',
+                inputTextColor: secondaryColor,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your username';
@@ -97,8 +104,11 @@ class RegisterForm extends ConsumerWidget {
               // Email Field
               WeightLogInputField(
                 controller: emailController,
+                textInputAction: TextInputAction.next,
+                keyboardType: TextInputType.emailAddress,
                 hintText: 'Enter your email',
                 labelText: 'Email',
+                inputTextColor: secondaryColor,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
@@ -115,8 +125,11 @@ class RegisterForm extends ConsumerWidget {
               // Country Field
               WeightLogInputField(
                 controller: countryController,
+                textInputAction: TextInputAction.next,
+                keyboardType: TextInputType.text,
                 hintText: 'Enter your country',
                 labelText: 'Country',
+                inputTextColor: secondaryColor,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your country';
@@ -129,8 +142,11 @@ class RegisterForm extends ConsumerWidget {
               // Password Field
               WeightLogInputField(
                 controller: passwordController,
+                textInputAction: TextInputAction.next,
+                keyboardType: TextInputType.visiblePassword,
                 hintText: 'Enter your password',
                 labelText: 'Password',
+                inputTextColor: secondaryColor,
                 obscureText: true,
                 suffixIcon: const Icon(Icons.visibility_off),
                 validator: (value) {
@@ -148,8 +164,11 @@ class RegisterForm extends ConsumerWidget {
               // Confirm Password Field
               WeightLogInputField(
                 controller: confirmPasswordController,
+                textInputAction: TextInputAction.done,
+                keyboardType: TextInputType.visiblePassword,
                 hintText: 'Confirm your password',
                 labelText: 'Confirm Password',
+                inputTextColor: secondaryColor,
                 obscureText: true,
                 suffixIcon: const Icon(Icons.visibility_off),
                 validator: (value) {

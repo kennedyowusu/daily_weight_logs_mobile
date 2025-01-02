@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
 import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
@@ -10,7 +9,7 @@ class WeightLogButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final String text;
   final bool? isLoading;
-  final Color buttonTextColor;
+  final Color buttonTextColor, buttonBackgroundColor;
   final FontWeight buttonTextFontWeight;
 
   const WeightLogButton({
@@ -20,6 +19,7 @@ class WeightLogButton extends StatelessWidget {
     required this.text,
     this.isLoading = false,
     this.buttonTextColor = Colors.white,
+    this.buttonBackgroundColor = secondaryColor,
     this.buttonTextFontWeight = FontWeight.w600,
   }) : super(key: key);
 
@@ -28,7 +28,8 @@ class WeightLogButton extends StatelessWidget {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         fixedSize: Size(MediaQuery.sizeOf(context).width, 53),
-        backgroundColor: isEnabled ? secondaryColor : const Color(0xFFD8D8D8),
+        // backgroundColor: isEnabled ? secondaryColor : const Color(0xFFD8D8D8),
+        backgroundColor: buttonBackgroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),

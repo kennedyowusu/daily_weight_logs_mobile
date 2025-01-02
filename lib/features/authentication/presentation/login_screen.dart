@@ -71,8 +71,11 @@ class LoginFormState extends ConsumerState<LoginForm> {
             // Email Field
             WeightLogInputField(
               controller: emailController,
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.emailAddress,
               hintText: 'Enter your email',
               labelText: 'Email',
+              inputTextColor: secondaryColor,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your email';
@@ -88,9 +91,12 @@ class LoginFormState extends ConsumerState<LoginForm> {
             // Password Field
             WeightLogInputField(
               controller: passwordController,
+              textInputAction: TextInputAction.done,
+              keyboardType: TextInputType.visiblePassword,
               hintText: 'Enter your password',
               labelText: 'Password',
               obscureText: true,
+              inputTextColor: secondaryColor,
               suffixIcon: const Icon(Icons.visibility_off),
               validator: (value) {
                 if (value == null || value.isEmpty) {

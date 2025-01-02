@@ -8,6 +8,9 @@ class WeightLogInputField extends StatelessWidget {
   final bool obscureText;
   final String? Function(String?)? validator;
   final Widget? suffixIcon;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+  final Color inputTextColor;
 
   const WeightLogInputField({
     super.key,
@@ -17,16 +20,26 @@ class WeightLogInputField extends StatelessWidget {
     this.obscureText = false,
     this.validator,
     this.suffixIcon,
+    this.keyboardType,
+    this.textInputAction,
+    this.inputTextColor = Colors.white,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
       controller: controller,
       obscureText: obscureText,
       decoration: customInputDecoration(
         hintText: hintText,
         suffixIcon: suffixIcon,
+      ),
+      style: TextStyle(
+        color: inputTextColor,
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
       ),
       validator: validator,
     );

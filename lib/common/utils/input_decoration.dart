@@ -7,8 +7,9 @@ InputDecoration customInputDecoration({
 }) {
   return InputDecoration(
     hintText: hintText,
+    fillColor: Colors.white,
     hintStyle: const TextStyle(
-      color: Color(0xFF898989),
+      color: grayTextColor,
       fontSize: 16,
       fontWeight: FontWeight.w400,
     ),
