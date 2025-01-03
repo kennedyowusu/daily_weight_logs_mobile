@@ -2,7 +2,6 @@ import 'package:daily_weight_logs_mobile/common/constants/api_response.dart';
 import 'package:daily_weight_logs_mobile/common/utils/weight_log_secure_storage.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/data/repositories/height_log_repository.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/domain/models/height_log_model.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HeightLogController extends StateNotifier<AsyncValue<HeightLog?>> {
@@ -10,45 +9,42 @@ class HeightLogController extends StateNotifier<AsyncValue<HeightLog?>> {
 
   HeightLogController(this.repository) : super(const AsyncData(null));
 
-  /// Fetch Height Logs
+  // Fetch Height Logs
   Future<void> fetchUserHeightLog() async {
-    final String? userId =
-        await DailyWeightLogsSecureStorage().getUserId(); // Fetch user ID
-    debugPrint('User ID: $userId');
-
-    state = const AsyncLoading(); // Set state to loading
-
-    if (userId == null) {
-      state = AsyncValue.error('User ID not found', StackTrace.current);
-      return;
-    }
+    state = const AsyncLoading();
 
     try {
-      // Step 1: Get healthDataId by userId
+      // Step 1: Fetch the user ID from secure storage
+      final String? userId = await DailyWeightLogsSecureStorage().getUserId();
+      if (userId == null) {
+        state = AsyncValue.error('User ID not found', StackTrace.current);
+        return;
+      }
+
+      // Step 2: Fetch the healthDataId for the user
       final String? healthDataId =
           await repository.getHealthDataIdByUserId(userId);
-
       if (healthDataId == null) {
         state =
             AsyncValue.error('Health data ID not found', StackTrace.current);
         return;
       }
 
-      // Step 2: Fetch the height log using healthDataId
+      // Step 3: Fetch the height log using the healthDataId
       final (HeightLogApiResponse? apiResponse, String? errorMessage) =
           await repository.fetchHeightLogByHealthDataId(healthDataId);
 
       if (apiResponse != null && apiResponse.data != null) {
-        state = AsyncValue.data(apiResponse.data); // Success
+        state = AsyncValue.data(
+            apiResponse.data); // Successfully fetched height log
       } else {
         state = AsyncValue.error(
           errorMessage ?? 'An unexpected error occurred',
           StackTrace.current,
         );
       }
-    } catch (e) {
-      state = AsyncValue.error(
-          'An unexpected error occurred: $e', StackTrace.current);
+    } catch (e, stackTrace) {
+      state = AsyncValue.error('An unexpected error occurred: $e', stackTrace);
     }
   }
 

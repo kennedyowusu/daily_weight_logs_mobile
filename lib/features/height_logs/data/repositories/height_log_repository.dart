@@ -10,6 +10,7 @@ class HeightLogRepository {
 
   Future<String?> getHealthDataIdByUserId(String userId) async {
     final String url = '$baseUrl/user-health-data/$userId';
+    debugPrint('Fetching healthData ID for user $userId from: $url');
     try {
       final response = await APIService.get(url: url);
 

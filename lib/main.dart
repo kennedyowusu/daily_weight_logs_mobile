@@ -28,11 +28,11 @@ class MyApp extends StatelessWidget {
     final bool isLoggedIn = await secureStorage.isUserLoggedIn();
 
     if (isLoggedIn) {
-      return MainRoutes.weightLogRoute; // Redirect to weight logs screen
+      return MainRoutes.weightLogRoute;
     } else if (seenOnboarding) {
-      return InitialRoutes.loginRoute; // Redirect to login screen
+      return InitialRoutes.loginRoute;
     } else {
-      return InitialRoutes.onboardingRoute; // Redirect to onboarding screen
+      return InitialRoutes.onboardingRoute;
     }
   }
 
@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             initialRoute: snapshot.data,
-            onGenerateRoute: AppRouter.generateRoute, // Use the route generator
+            onGenerateRoute: AppRouter.generateRoute,
           );
         }
       },
