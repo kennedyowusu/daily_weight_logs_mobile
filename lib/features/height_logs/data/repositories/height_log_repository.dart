@@ -8,10 +8,28 @@ import 'package:flutter/material.dart';
 class HeightLogRepository {
   final String healthLogUrl = baseUrl + healthDataUrl;
 
-  Future<(HeightLogApiResponse?, String?)> fetchHeightLogByUserId(
-      String userId) async {
-    final String url = '$healthLogUrl/$userId'; // Append userId to the URL
-    debugPrint('Fetching height log for user $userId from: $url');
+  Future<String?> getHealthDataIdByUserId(String userId) async {
+    final String url = '$baseUrl/user-health-data/$userId';
+    try {
+      final response = await APIService.get(url: url);
+
+      if (response.statusCode == 200) {
+        return response
+            .data['id']; // Assuming the response contains the healthData ID
+      } else {
+        debugPrint('Error Response Data: ${response.data}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Error fetching healthData ID: $e');
+      return null;
+    }
+  }
+
+  Future<(HeightLogApiResponse?, String?)> fetchHeightLogByHealthDataId(
+      String healthDataId) async {
+    final String url = '$healthLogUrl/$healthDataId'; // Use healthDataId
+    debugPrint('Fetching height log for healthDataId $healthDataId from: $url');
     try {
       final response = await APIService.get(url: url);
 
@@ -19,9 +37,11 @@ class HeightLogRepository {
         final apiResponse = HeightLogApiResponse.fromJson(response.data);
         return (apiResponse, null);
       } else {
+        debugPrint('Error Response Data: ${response.data}');
         return (null, errorParser(response.data));
       }
     } catch (e) {
+      debugPrint('Error fetching height log: $e');
       return (null, 'An unexpected error occurred: $e');
     }
   }

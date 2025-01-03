@@ -18,16 +18,37 @@ class HeightLogController extends StateNotifier<AsyncValue<HeightLog?>> {
 
     state = const AsyncLoading(); // Set state to loading
 
-    final (HeightLogApiResponse? apiResponse, String? errorMessage) =
-        await repository.fetchHeightLogByUserId(userId ?? '');
+    if (userId == null) {
+      state = AsyncValue.error('User ID not found', StackTrace.current);
+      return;
+    }
 
-    if (apiResponse != null && apiResponse.data != null) {
-      state = AsyncValue.data(apiResponse.data);
-    } else {
+    try {
+      // Step 1: Get healthDataId by userId
+      final String? healthDataId =
+          await repository.getHealthDataIdByUserId(userId);
+
+      if (healthDataId == null) {
+        state =
+            AsyncValue.error('Health data ID not found', StackTrace.current);
+        return;
+      }
+
+      // Step 2: Fetch the height log using healthDataId
+      final (HeightLogApiResponse? apiResponse, String? errorMessage) =
+          await repository.fetchHeightLogByHealthDataId(healthDataId);
+
+      if (apiResponse != null && apiResponse.data != null) {
+        state = AsyncValue.data(apiResponse.data); // Success
+      } else {
+        state = AsyncValue.error(
+          errorMessage ?? 'An unexpected error occurred',
+          StackTrace.current,
+        );
+      }
+    } catch (e) {
       state = AsyncValue.error(
-        errorMessage ?? 'An unexpected error occurred',
-        StackTrace.current,
-      );
+          'An unexpected error occurred: $e', StackTrace.current);
     }
   }
 
