@@ -33,6 +33,16 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
 
     debugPrint('Weight Log State: ${weightLogState.asData}');
 
+    weightLogState.when(
+      data: (weightLogs) {
+        for (final weightLog in weightLogs) {
+          debugPrint('Weight Log: ${weightLog.loggedAt}');
+        }
+      },
+      loading: () => debugPrint('Loading weight logs...'),
+      error: (error, stack) => debugPrint('Error loading weight logs: $error'),
+    );
+
     return Scaffold(
       backgroundColor: secondaryColor,
       body: SafeArea(
@@ -470,31 +480,94 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                   ],
                 ),
                 const SizedBox(height: 10),
+
+                // Weight Log History
+                // Weight Log History
                 Container(
+                  padding: const EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
                     color: Colors.black,
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: 5,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(
-                          index == 0 ? 'Today: +0.5 kg' : 'Yesterday: -0.8 kg',
-                          style: TextStyle(
-                            color: index == 0 ? Colors.red : Colors.green,
-                          ),
-                        ),
-                        trailing: const Text(
-                          '62.5 kg',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
+                  child: weightLogState.when(
+                    data: (weightLogs) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: weightLogs.length,
+                        itemBuilder: (context, index) {
+                          final weightLog = weightLogs[index];
+                          final previousWeight = index < weightLogs.length - 1
+                              ? weightLogs[index + 1].weight
+                              : weightLog
+                                  .weight; // Default to current weight for the first log
+                          final weightDifference =
+                              (weightLog.weight ?? 0) - (previousWeight ?? 0);
+                          final isPositiveChange = weightDifference > 0;
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1C1C1E),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: const EdgeInsets.all(16.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      WeightLogText(
+                                        text: index == 0
+                                            ? 'Today'
+                                            : index == 1
+                                                ? 'Yesterday'
+                                                : weightLog.loggedAt ??
+                                                    'Unknown date',
+                                        fontSize: 14,
+                                        color: grayTextColor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      WeightLogText(
+                                        text:
+                                            '${isPositiveChange ? '+' : ''}${weightDifference.toStringAsFixed(1)} kg',
+                                        fontSize: 14,
+                                        color: isPositiveChange
+                                            ? Colors.red
+                                            : Colors.green,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ],
+                                  ),
+                                  WeightLogText(
+                                    text:
+                                        '${weightLog.weight?.toStringAsFixed(1)} kg',
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                       );
                     },
+                    loading: () => const Center(
+                      child: CircularProgressIndicator(color: primaryColor),
+                    ),
+                    error: (error, _) => Center(
+                      child: WeightLogText(
+                        text: 'Error: $error',
+                        fontSize: 14,
+                        color: Colors.red,
+                      ),
+                    ),
                   ),
                 ),
               ],
