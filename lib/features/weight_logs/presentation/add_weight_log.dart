@@ -2,6 +2,7 @@ import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_app_bar.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_button.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
+import 'package:daily_weight_logs_mobile/features/weight_logs/application/weight_log_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
@@ -18,6 +19,7 @@ class _AddWeightLogScreenState extends ConsumerState<AddWeightLogScreen> {
   DateTime? selectedDate = DateTime.now();
   final TextEditingController weightController = TextEditingController();
   String? selectedTimeOfDay;
+  bool isSubmitting = false;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +42,7 @@ class _AddWeightLogScreenState extends ConsumerState<AddWeightLogScreen> {
               key: formKey,
               child: Column(
                 children: [
-                  // Calendar Picker
+                  // Select Date
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: WeightLogText(
@@ -106,11 +108,6 @@ class _AddWeightLogScreenState extends ConsumerState<AddWeightLogScreen> {
                         fontWeight: FontWeight.w600,
                       ),
                       currentDate: DateTime.now(),
-                      // selectableDayPredicate: (date) {
-                      //   return date.day == DateTime.now().day &&
-                      //       date.month == DateTime.now().month &&
-                      //       date.year == DateTime.now().year;
-                      // },
                       selectedDayHighlightColor: primaryColor.withOpacity(0.5),
 
                       calendarType: CalendarDatePicker2Type.single,
@@ -124,6 +121,8 @@ class _AddWeightLogScreenState extends ConsumerState<AddWeightLogScreen> {
                   ),
 
                   SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
+
+                  // Weight Input
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: WeightLogText(
@@ -158,7 +157,8 @@ class _AddWeightLogScreenState extends ConsumerState<AddWeightLogScreen> {
                     },
                   ),
                   const SizedBox(height: 40),
-                  // Time of Day
+
+                  // Time of Day Selector
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: WeightLogText(
@@ -182,13 +182,20 @@ class _AddWeightLogScreenState extends ConsumerState<AddWeightLogScreen> {
                             padding: const EdgeInsets.symmetric(
                                 vertical: 15, horizontal: 20),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: selectedTimeOfDay == 'Morning'
+                                  ? primaryColor
+                                  : Colors.white,
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Center(
+                            child: Center(
                               child: WeightLogText(
                                 text: 'Morning',
-                                color: secondaryColor,
+                                color: selectedTimeOfDay == 'Morning'
+                                    ? secondaryColor
+                                    : secondaryColor,
+                                fontWeight: selectedTimeOfDay == 'Morning'
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
                               ),
                             ),
                           ),
@@ -206,13 +213,20 @@ class _AddWeightLogScreenState extends ConsumerState<AddWeightLogScreen> {
                             padding: const EdgeInsets.symmetric(
                                 vertical: 15, horizontal: 20),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: selectedTimeOfDay == 'Evening'
+                                  ? primaryColor
+                                  : Colors.white,
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Center(
+                            child: Center(
                               child: WeightLogText(
                                 text: 'Evening',
-                                color: secondaryColor,
+                                color: selectedTimeOfDay == 'Evening'
+                                    ? secondaryColor
+                                    : secondaryColor,
+                                fontWeight: selectedTimeOfDay == 'Evening'
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
                               ),
                             ),
                           ),
@@ -221,33 +235,62 @@ class _AddWeightLogScreenState extends ConsumerState<AddWeightLogScreen> {
                     ],
                   ),
                   SizedBox(height: MediaQuery.sizeOf(context).height * 0.04),
+
+                  // Log Weight Button
                   WeightLogButton(
                     text: "Log Weight",
                     buttonBackgroundColor: primaryColor,
                     buttonTextColor: secondaryColor,
-                    onPressed: () {
-                      if (formKey.currentState?.validate() == true &&
-                          selectedDate != null &&
-                          selectedTimeOfDay != null) {
-                        final weight = int.parse(weightController.text.trim());
-                        final loggedAt =
-                            "${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}";
-                        debugPrint(
-                            'Weight: $weight, Time of Day: $selectedTimeOfDay, Logged At: $loggedAt');
-                        // ref
-                        //     .read(weightLogControllerProvider.notifier)
-                        //     .addWeightLog(
-                        //       weight: weight,
-                        //       timeOfDay: selectedTimeOfDay!,
-                        //       loggedAt: loggedAt,
-                        //     );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Weight log added successfully!')),
-                        );
-                      }
-                    },
-                  ),
+                    isEnabled: !isSubmitting,
+                    onPressed: isSubmitting
+                        ? null
+                        : () async {
+                            if (formKey.currentState?.validate() == true &&
+                                selectedDate != null &&
+                                selectedTimeOfDay != null) {
+                              setState(() {
+                                isSubmitting = true;
+                              });
+
+                              final weight =
+                                  int.parse(weightController.text.trim());
+
+                              // Adjust the time for loggedAt based on selectedTimeOfDay
+                              DateTime loggedAt = selectedDate!;
+                              if (selectedTimeOfDay == 'Morning') {
+                                loggedAt = loggedAt.copyWith(
+                                    hour: 8, minute: 0); // Default to 8:00 AM
+                              } else if (selectedTimeOfDay == 'Evening') {
+                                loggedAt = loggedAt.copyWith(
+                                    hour: 19, minute: 0); // Default to 7:00 PM
+                              }
+
+                              await ref
+                                  .read(weightLogControllerProvider.notifier)
+                                  .addWeightLog(
+                                    weight: weight,
+                                    timeOfDay: selectedTimeOfDay!,
+                                    loggedAt: loggedAt.toIso8601String(),
+                                  );
+
+                              setState(() {
+                                isSubmitting = false;
+                                weightController.clear();
+                                selectedTimeOfDay = null;
+                                selectedDate = DateTime.now();
+                              });
+
+                              debugPrint('Weight log added successfully! 🎉');
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content:
+                                      Text('Weight log added successfully!'),
+                                ),
+                              );
+                            }
+                          },
+                  )
                 ],
               ),
             ),

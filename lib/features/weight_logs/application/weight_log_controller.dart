@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/weight_log_repository.dart';
 import '../domain/weight_log.dart';
@@ -14,13 +13,14 @@ class WeightLogController
 
   Future<void> fetchWeightLogs() async {
     state = const AsyncLoading(); // Reset state to loading while fetching
+
     final (ApiSuccess<List<WeightLogModel>>? res, ApiError? err) =
         await repository.fetchWeightLogs();
 
-    if (res != null) {
-      state = AsyncValue.data(res.data!); // Update state with fetched data
+    if (res != null && res.data != null) {
+      state = AsyncValue.data(res.data!);
     } else if (err != null) {
-      state = AsyncValue.error(err.message, StackTrace.current); // Handle error
+      state = AsyncValue.error(err.message, StackTrace.current);
     }
   }
 
@@ -29,6 +29,8 @@ class WeightLogController
     required String timeOfDay,
     required String loggedAt,
   }) async {
+    state = const AsyncLoading();
+
     final (ApiSuccess<void>? res, ApiError? err) =
         await repository.addWeightLog(
       weight: weight,
@@ -66,5 +68,4 @@ final weightLogControllerProvider = StateNotifierProvider<WeightLogController,
   (ref) => WeightLogController(ref.watch(weightLogRepositoryProvider)),
 );
 
-final weightLogRepositoryProvider =
-    Provider((ref) => WeightLogRepository(Dio()));
+// final weightLogRepositoryProvider = Provider((ref) => WeightLogRepository());

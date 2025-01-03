@@ -1,20 +1,18 @@
+import 'package:daily_weight_logs_mobile/common/constants/endpoints.dart';
 import 'package:daily_weight_logs_mobile/common/utils/error_parser.dart';
 import 'package:daily_weight_logs_mobile/features/weight_logs/domain/weight_log.dart';
 import 'package:daily_weight_logs_mobile/common/constants/api_response.dart';
 import 'package:daily_weight_logs_mobile/services/api_services.dart';
-import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class WeightLogRepository {
-  final Dio dio;
-
-  WeightLogRepository(this.dio);
+  final String weightDataUrl = baseUrl + weightLogsUrl;
 
   Future<(ApiSuccess<List<WeightLogModel>>?, ApiError?)>
       fetchWeightLogs() async {
     try {
-      final response = await APIService.get(
-        url: '/api/v1/weight-logs',
-      );
+      final response = await APIService.get(url: weightDataUrl);
 
       if (response.statusCode == 200) {
         final decodedRes = (response.data as List)
@@ -52,29 +50,29 @@ class WeightLogRepository {
     required String timeOfDay,
     required String loggedAt,
   }) async {
+    debugPrint('Adding weight log to: $weightDataUrl');
     try {
       final response = await APIService.post(
-        url: '/api/v1/weight-logs',
+        url: weightDataUrl,
         body: {
-          'weight': weight,
-          'time_of_day': timeOfDay,
-          'logged_at': loggedAt,
+          "weight": weight,
+          "time_of_day": timeOfDay.toLowerCase(),
+          "logged_at": loggedAt,
         },
       );
 
+      debugPrint('Response: ${response.data}');
+
       if (response.statusCode == 201) {
         return (
-          ApiSuccess<void>(
-            statusCode: response.statusCode ?? 0,
-            data: null,
-          ),
+          ApiSuccess<void>(statusCode: response.statusCode!, data: null),
           null
         );
       } else {
         return (
           null,
           ApiError(
-            statusCode: response.statusCode ?? 0,
+            statusCode: response.statusCode!,
             message: errorParser(response.data),
           )
         );
@@ -84,7 +82,7 @@ class WeightLogRepository {
         null,
         ApiError(
           statusCode: 500,
-          message: 'Error adding weight log',
+          message: 'An unexpected error occurred: $e',
         )
       );
     }
@@ -126,3 +124,5 @@ class WeightLogRepository {
     }
   }
 }
+
+final weightLogRepositoryProvider = Provider((ref) => WeightLogRepository());
