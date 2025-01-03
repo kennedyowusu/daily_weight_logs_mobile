@@ -38,7 +38,7 @@ class HeightLogController extends StateNotifier<AsyncValue<HeightLog?>> {
       state = AsyncValue.error(err.message, StackTrace.current);
     }
 
-    fetchHeightLogs();
+    // fetchHeightLogs();
   }
 
   double convertToMeters(String input, {bool isUsingFeet = false}) {
