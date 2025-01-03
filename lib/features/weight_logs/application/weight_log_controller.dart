@@ -67,5 +67,3 @@ final weightLogControllerProvider = StateNotifierProvider<WeightLogController,
     AsyncValue<List<WeightLogModel>>>(
   (ref) => WeightLogController(ref.watch(weightLogRepositoryProvider)),
 );
-
-// final weightLogRepositoryProvider = Provider((ref) => WeightLogRepository());

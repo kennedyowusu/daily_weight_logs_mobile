@@ -1,8 +1,10 @@
 import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_app_bar.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_button.dart';
+import 'package:daily_weight_logs_mobile/common/widgets/weight_log_loading_dialog.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
 import 'package:daily_weight_logs_mobile/features/weight_logs/application/weight_log_controller.dart';
+import 'package:daily_weight_logs_mobile/router/authenticated_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
@@ -19,7 +21,6 @@ class _AddWeightLogScreenState extends ConsumerState<AddWeightLogScreen> {
   DateTime? selectedDate = DateTime.now();
   final TextEditingController weightController = TextEditingController();
   String? selectedTimeOfDay;
-  bool isSubmitting = false;
 
   @override
   Widget build(BuildContext context) {
@@ -241,55 +242,66 @@ class _AddWeightLogScreenState extends ConsumerState<AddWeightLogScreen> {
                     text: "Log Weight",
                     buttonBackgroundColor: primaryColor,
                     buttonTextColor: secondaryColor,
-                    isEnabled: !isSubmitting,
-                    onPressed: isSubmitting
-                        ? null
-                        : () async {
-                            if (formKey.currentState?.validate() == true &&
-                                selectedDate != null &&
-                                selectedTimeOfDay != null) {
-                              setState(() {
-                                isSubmitting = true;
-                              });
-
-                              final weight =
-                                  int.parse(weightController.text.trim());
-
-                              // Adjust the time for loggedAt based on selectedTimeOfDay
-                              DateTime loggedAt = selectedDate!;
-                              if (selectedTimeOfDay == 'Morning') {
-                                loggedAt = loggedAt.copyWith(
-                                    hour: 8, minute: 0); // Default to 8:00 AM
-                              } else if (selectedTimeOfDay == 'Evening') {
-                                loggedAt = loggedAt.copyWith(
-                                    hour: 19, minute: 0); // Default to 7:00 PM
-                              }
-
-                              await ref
-                                  .read(weightLogControllerProvider.notifier)
-                                  .addWeightLog(
-                                    weight: weight,
-                                    timeOfDay: selectedTimeOfDay!,
-                                    loggedAt: loggedAt.toIso8601String(),
-                                  );
-
-                              setState(() {
-                                isSubmitting = false;
-                                weightController.clear();
-                                selectedTimeOfDay = null;
-                                selectedDate = DateTime.now();
-                              });
-
-                              debugPrint('Weight log added successfully! 🎉');
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content:
-                                      Text('Weight log added successfully!'),
-                                ),
-                              );
-                            }
+                    onPressed: () async {
+                      if (formKey.currentState?.validate() == true &&
+                          selectedDate != null &&
+                          selectedTimeOfDay != null) {
+                        // Show loading dialog
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) {
+                            return const WeightLogLoadingDialog(
+                              message: 'Adding weight log...',
+                            );
                           },
+                        );
+
+                        final weight = int.parse(weightController.text.trim());
+
+                        // Adjust the time for loggedAt based on selectedTimeOfDay
+                        DateTime loggedAt = selectedDate!;
+                        if (selectedTimeOfDay == 'Morning') {
+                          loggedAt = loggedAt.copyWith(hour: 8, minute: 0);
+                        } else if (selectedTimeOfDay == 'Evening') {
+                          loggedAt = loggedAt.copyWith(hour: 19, minute: 0);
+                        }
+
+                        await ref
+                            .read(weightLogControllerProvider.notifier)
+                            .addWeightLog(
+                              weight: weight,
+                              timeOfDay: selectedTimeOfDay!,
+                              loggedAt: loggedAt.toIso8601String(),
+                            );
+
+                        ref.watch(weightLogControllerProvider).when(
+                          data: (_) {
+                            Navigator.of(context).pop();
+                            Navigator.pushReplacementNamed(
+                              context,
+                              MainRoutes.weightLogRoute,
+                            );
+                          },
+                          error: (error, _) {
+                            Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(error.toString())),
+                            );
+                          },
+                          loading: () {
+                            // Already handled by dialog
+                          },
+                        );
+
+                        // Reset fields
+                        setState(() {
+                          weightController.clear();
+                          selectedTimeOfDay = null;
+                          selectedDate = DateTime.now();
+                        });
+                      }
+                    },
                   )
                 ],
               ),
