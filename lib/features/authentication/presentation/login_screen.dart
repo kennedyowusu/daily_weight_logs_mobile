@@ -1,5 +1,6 @@
 import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/constants/images.dart';
+import 'package:daily_weight_logs_mobile/common/utils/secure_storage.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_button.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_loading_dialog.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
@@ -120,6 +121,77 @@ class LoginFormState extends ConsumerState<LoginForm> {
             ),
             const SizedBox(height: 24),
 
+            // WeightLogButton(
+            //   text: 'Login to your Account',
+            //   buttonTextColor: Colors.white,
+            //   isEnabled: true,
+            //   key: const Key('login_button'),
+            //   onPressed: () async {
+            //     if (formKey.currentState?.validate() == true) {
+            //       // Show loading dialog
+            //       showDialog(
+            //         context: context,
+            //         barrierDismissible: false,
+            //         barrierColor: Colors.black.withOpacity(0.5),
+            //         useSafeArea: true,
+            //         builder: (BuildContext context) {
+            //           return const WeightLogLoadingDialog(
+            //               message: 'Logging in...');
+            //         },
+            //       );
+
+            //       // Call login API
+            //       await ref.read(authControllerProvider.notifier).login(
+            //             emailController.text.trim(),
+            //             passwordController.text.trim(),
+            //           );
+
+            //       // Dismiss the loading dialog
+            //       Navigator.of(context).pop();
+
+            //       // Handle login response
+            //       final authState = ref.watch(authControllerProvider);
+            //       authState.when(
+            //         data: (response) {
+            //           if (response?.token != null) {
+            //             // Dismiss loading dialog
+            //             Navigator.of(context).pop();
+
+            //             // Navigate to the next screen
+            //             Navigator.pushReplacementNamed(
+            //               context,
+            //               MainRoutes.heightLogRoute,
+            //             );
+            //           } else {
+            //             // Dismiss loading dialog and show error
+            //             Navigator.of(context).pop();
+            //             ScaffoldMessenger.of(context).showSnackBar(
+            //               SnackBar(
+            //                 content: Text(
+            //                     response?.message ?? 'Unknown error occurred'),
+            //                 backgroundColor: Colors.red,
+            //               ),
+            //             );
+            //           }
+            //         },
+            //         loading: () {
+            //           // Loading state is handled by the dialog
+            //         },
+            //         error: (error, stackTrace) {
+            //           // Dismiss loading dialog and show error
+            //           Navigator.of(context).pop();
+            //           ScaffoldMessenger.of(context).showSnackBar(
+            //             SnackBar(
+            //               content: Text(error.toString()),
+            //               backgroundColor: Colors.red,
+            //             ),
+            //           );
+            //         },
+            //       );
+            //     }
+            //   },
+            // ),
+
             WeightLogButton(
               text: 'Login to your Account',
               buttonTextColor: Colors.white,
@@ -140,49 +212,37 @@ class LoginFormState extends ConsumerState<LoginForm> {
                   );
 
                   // Call login API
-                  await ref.read(authControllerProvider.notifier).login(
-                      emailController.text.trim(),
-                      passwordController.text.trim());
+                  final authResponse = await ref
+                      .read(authControllerProvider.notifier)
+                      .login(emailController.text.trim(),
+                          passwordController.text.trim());
 
-                  // Handle login response
-                  final authState = ref.watch(authControllerProvider);
-                  authState.when(
-                    data: (response) {
-                      if (response?.token != null) {
-                        // Dismiss loading dialog
-                        Navigator.of(context).pop();
+                  // Dismiss the loading dialog
+                  Navigator.of(context).pop();
 
-                        // Navigate to the next screen
-                        Navigator.pushReplacementNamed(
-                          context,
-                          MainRoutes.heightLogRoute,
-                        );
-                      } else {
-                        // Dismiss loading dialog and show error
-                        Navigator.of(context).pop();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                response?.message ?? 'Unknown error occurred'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    },
-                    loading: () {
-                      // Loading state is handled by the dialog
-                    },
-                    error: (error, stackTrace) {
-                      // Dismiss loading dialog and show error
-                      Navigator.of(context).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(error.toString()),
-                          backgroundColor: Colors.red,
-                        ),
+                  if (authResponse?.token != null) {
+                    // Store the access token
+                    await DailyWeightLogsSecureStorage()
+                        .storeAccessToken(authResponse!.token!);
+
+                    // Navigate to the WeightLogScreen
+                    if (mounted) {
+                      Navigator.pushReplacementNamed(
+                        context,
+                        MainRoutes.weightLogRoute,
                       );
-                    },
-                  );
+                    }
+                  } else {
+                    // Show error message if login fails
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          authResponse?.message ?? 'Unknown error occurred',
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 }
               },
             ),

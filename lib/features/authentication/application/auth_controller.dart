@@ -15,23 +15,41 @@ class AuthController extends StateNotifier<AsyncValue<AuthApiResponse?>> {
   AuthController(this.repository) : super(const AsyncData(null));
 
   /// Handle user login
-  Future<void> login(String email, String password) async {
+  // Future<void> login(String email, String password) async {
+  //   state = const AsyncLoading();
+
+  //   final (ApiSuccess<AuthApiResponse>? success, ApiError? error) =
+  //       await repository
+  //           .login(LoginAuthRequest(email: email, password: password));
+
+  //   if (success != null) {
+  //     // Set state to successful response
+  //     state = AsyncValue.data(success.data);
+
+  //     // Save token or user details locally (e.g., in secure storage)
+  //     if (success.data!.token != null) {
+  //       await secureStorage.storeAccessToken(success.data?.token ?? '');
+  //     }
+  //   } else if (error != null) {
+  //     // Set state to error
+  //     state = AsyncValue.error(error.message, StackTrace.current);
+  //   }
+  // }
+
+  Future<AuthApiResponse?> login(String email, String password) async {
     state = const AsyncLoading();
-    final (ApiSuccess<AuthApiResponse>? res, ApiError? err) = await repository
-        .login(LoginAuthRequest(email: email, password: password));
 
-    if (res != null) {
-      // Set state to successful response
-      state = AsyncValue.data(res.data);
+    final (ApiSuccess<AuthApiResponse>? success, ApiError? error) =
+        await repository
+            .login(LoginAuthRequest(email: email, password: password));
 
-      // Save token or user details locally (e.g., in secure storage)
-      if (res.data!.token != null) {
-        await secureStorage.storeAccessToken(res.data?.token ?? '');
-      }
-    } else if (err != null) {
-      // Set state to error
-      state = AsyncValue.error(err.message, StackTrace.current);
+    if (success != null) {
+      state = AsyncValue.data(success.data);
+      return success.data;
+    } else if (error != null) {
+      state = AsyncValue.error(error.message, StackTrace.current);
     }
+    return null;
   }
 
   /// Handle user registration

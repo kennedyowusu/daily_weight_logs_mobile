@@ -1,8 +1,10 @@
 import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/constants/images.dart';
+import 'package:daily_weight_logs_mobile/common/utils/secure_storage.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text_button.dart';
 import 'package:daily_weight_logs_mobile/features/onboarding/application/onboarding_controller.dart';
 import 'package:daily_weight_logs_mobile/features/onboarding/presentation/onboarding_slide.dart';
+import 'package:daily_weight_logs_mobile/router/authenticated_routes.dart';
 import 'package:daily_weight_logs_mobile/router/unauthenticated_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -139,9 +141,15 @@ class OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   text: 'Get Started',
                   onPressed: () async {
                     await controller.completeOnboarding();
+                    final isLoggedIn =
+                        await DailyWeightLogsSecureStorage().isUserLoggedIn();
+
                     if (mounted) {
-                      Navigator.of(context)
-                          .pushReplacementNamed(InitialRoutes.loginRoute);
+                      Navigator.of(context).pushReplacementNamed(
+                        isLoggedIn
+                            ? MainRoutes.weightLogRoute
+                            : InitialRoutes.loginRoute,
+                      );
                     }
                   },
                   textColor: secondaryColor,

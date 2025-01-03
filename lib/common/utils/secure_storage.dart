@@ -17,6 +17,11 @@ class DailyWeightLogsSecureStorage {
     return _storage.delete(key: _accessTokenKey);
   }
 
+  Future<bool> isUserLoggedIn() async {
+    final String token = await getAccessToken();
+    return token.isNotEmpty;
+  }
+
   // Onboarding Completed Flag
   Future<bool> isUserSeenOnboarding() {
     return _storage.read(key: _userSeenOnboardingKey).then((value) {
