@@ -171,183 +171,166 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                     color: grayTextColor.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: LineChart(
-                    curve: Curves.easeInOut,
-                    LineChartData(
-                      minX: value,
-                      maxX: 5,
-                      baselineX: 0,
-                      baselineY: 50,
-                      gridData: FlGridData(
-                        show: true,
-                        drawVerticalLine: true,
-                        drawHorizontalLine: true,
-                        horizontalInterval: 5,
-                        verticalInterval: 1,
-                        getDrawingVerticalLine: (value) {
-                          return FlLine(
-                            color: grayTextColor.withOpacity(0.5),
-                            strokeWidth: 1,
-                          );
-                        },
-                        getDrawingHorizontalLine: (value) {
-                          return FlLine(
-                            color: grayTextColor.withOpacity(0.5),
-                            strokeWidth: 1,
-                          );
-                        },
-                        checkToShowVerticalLine: (value) {
-                          return value % 1 == 0;
-                        },
-                        checkToShowHorizontalLine: (value) {
-                          return value % 5 == 0;
-                        },
-                      ), // Disable grid lines
-                      titlesData: FlTitlesData(
-                        rightTitles: const AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: false, // Hide right Y-axis labels
+                  child: weightLogState.when(
+                    data: (weightLogs) {
+                      // Prepare data for the graph
+                      List<FlSpot> graphSpots = [];
+                      List<String> logLabels = [];
+
+                      for (int i = 0; i < weightLogs.length; i++) {
+                        final log = weightLogs[i];
+                        logLabels.add(
+                            'Log ${i + 1}'); // Add labels like "Log 1", "Log 2", etc.
+
+                        graphSpots.add(
+                          FlSpot(
+                            i.toDouble(), // X-axis based on log order
+                            log.weight!.toDouble(), // Y-axis based on weight
                           ),
-                        ),
-                        topTitles: const AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: false, // Hide top X-axis labels
-                          ),
-                        ),
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true, // Hide left Y-axis labels
-                            getTitlesWidget: (value, meta) {
-                              return WeightLogText(
-                                text: '${value.toStringAsFixed(0)} kg',
-                                fontSize: 10,
-                                color: grayTextColor,
+                        );
+                      }
+
+                      return LineChart(
+                        LineChartData(
+                          minX: 0, // Start of x-axis
+                          maxX: weightLogs.length - 1, // End of x-axis
+                          minY: 50, // Minimum y-axis value
+                          maxY: 300, // Maximum y-axis value
+                          gridData: FlGridData(
+                            show: true,
+                            drawVerticalLine: true,
+                            drawHorizontalLine: true,
+                            horizontalInterval: 50,
+                            verticalInterval: 1,
+                            getDrawingHorizontalLine: (value) {
+                              return FlLine(
+                                color: grayTextColor.withOpacity(0.5),
+                                strokeWidth: 1,
                               );
                             },
-                            reservedSize: 40,
-                          ),
-                        ),
-                        bottomTitles: AxisTitles(
-                          axisNameSize: 0,
-                          axisNameWidget: const SizedBox.shrink(),
-                          sideTitles: SideTitles(
-                            showTitles: true, // bottom axis labels
-                            interval: 1,
-                            getTitlesWidget: (value, meta) {
-                              // Show x-axis labels for months
-                              switch (value.toInt()) {
-                                case 0:
-                                  return const WeightLogText(
-                                    text: 'Jul',
-                                    fontSize: 12,
-                                    color: grayTextColor,
-                                  );
-                                case 1:
-                                  return const WeightLogText(
-                                    text: 'Aug',
-                                    fontSize: 12,
-                                    color: grayTextColor,
-                                  );
-                                case 2:
-                                  return const WeightLogText(
-                                    text: 'Sept',
-                                    fontSize: 12,
-                                    color: grayTextColor,
-                                  );
-                                case 3:
-                                  return const WeightLogText(
-                                    text: 'Oct',
-                                    fontSize: 12,
-                                    color: grayTextColor,
-                                  );
-                                case 4:
-                                  return const WeightLogText(
-                                    text: 'Nov',
-                                    fontSize: 12,
-                                    color: grayTextColor,
-                                  );
-                                case 5:
-                                  return const WeightLogText(
-                                    text: 'Dec',
-                                    fontSize: 12,
-                                    color: grayTextColor,
-                                  );
-                              }
-                              return const SizedBox.shrink();
-                            },
-                          ),
-                        ),
-                      ),
-                      borderData: FlBorderData(show: false),
-                      lineBarsData: [
-                        LineChartBarData(
-                          spots: const [
-                            FlSpot(0, 68.2), // Jul
-                            FlSpot(1, 62.5), // Aug
-                            FlSpot(2, 54.0), // Sept
-                            FlSpot(3, 60.0), // Oct
-                            FlSpot(4, 62.5), // Nov
-                            FlSpot(5, 63.0), // Dec
-                          ],
-                          isCurved: true, // Smooth curve
-                          color: primaryColor,
-                          barWidth: 3,
-                          isStrokeCapRound: true,
-                          dotData: FlDotData(
-                            show: true,
-                            getDotPainter: (spot, percent, barData, index) {
-                              if (index == 5) {
-                                return FlDotCirclePainter(
-                                  radius: 6,
-                                  color: primaryColor,
-                                  strokeWidth: 2,
-                                  strokeColor: Colors.white,
-                                ); // Highlight the last point (Dec)
-                              }
-                              return FlDotCirclePainter(
-                                radius: 5,
-                                color: primaryColor,
-                                strokeWidth: 0,
+                            getDrawingVerticalLine: (value) {
+                              return FlLine(
+                                color: grayTextColor.withOpacity(0.5),
+                                strokeWidth: 1,
                               );
                             },
                           ),
-                          belowBarData: BarAreaData(
-                            show: true,
-                            gradient: LinearGradient(
-                              colors: [
-                                primaryColor.withOpacity(0.2),
-                                Colors.transparent
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              stops: const [0.5, 1],
+                          titlesData: FlTitlesData(
+                            rightTitles: const AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: false,
+                              ),
+                            ),
+                            topTitles: const AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: false,
+                              ),
+                            ),
+                            leftTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 40,
+                                interval: 50,
+                                getTitlesWidget: (value, meta) {
+                                  return WeightLogText(
+                                    text: '${value.toInt()} kg',
+                                    fontSize: 10,
+                                    color: grayTextColor,
+                                  );
+                                },
+                              ),
+                            ),
+                            bottomTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                interval: 1,
+                                getTitlesWidget: (value, meta) {
+                                  final index = value.toInt();
+                                  if (index >= 0 && index < logLabels.length) {
+                                    return WeightLogText(
+                                      text: logLabels[index],
+                                      fontSize: 12,
+                                      color: grayTextColor,
+                                    );
+                                  }
+                                  return const SizedBox.shrink();
+                                },
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                      minY: 50,
-                      maxY: 70,
-                      lineTouchData: LineTouchData(
-                        touchTooltipData: LineTouchTooltipData(
-                          getTooltipColor: (spot) => secondaryColor,
-                          getTooltipItems: (List<LineBarSpot> touchedSpots) {
-                            return touchedSpots.map((spot) {
-                              return LineTooltipItem(
-                                '${spot.y.toStringAsFixed(1)} kg',
-                                const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
+                          borderData: FlBorderData(show: false),
+                          lineBarsData: [
+                            LineChartBarData(
+                              spots: graphSpots,
+                              isCurved: true,
+                              color: primaryColor,
+                              barWidth: 3,
+                              isStrokeCapRound: true,
+                              dotData: FlDotData(
+                                show: true,
+                                getDotPainter: (spot, percent, barData, index) {
+                                  if (index == graphSpots.length - 1) {
+                                    return FlDotCirclePainter(
+                                      radius: 6,
+                                      color: primaryColor,
+                                      strokeWidth: 2,
+                                      strokeColor: Colors.white,
+                                    ); // Highlight the last point
+                                  }
+                                  return FlDotCirclePainter(
+                                    radius: 5,
+                                    color: primaryColor,
+                                    strokeWidth: 0,
+                                  );
+                                },
+                              ),
+                              belowBarData: BarAreaData(
+                                show: true,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    primaryColor.withOpacity(0.2),
+                                    Colors.transparent,
+                                  ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
                                 ),
-                              );
-                            }).toList();
-                          },
+                              ),
+                            ),
+                          ],
+                          lineTouchData: LineTouchData(
+                            touchTooltipData: LineTouchTooltipData(
+                              getTooltipColor: (spot) => secondaryColor,
+                              getTooltipItems:
+                                  (List<LineBarSpot> touchedSpots) {
+                                return touchedSpots.map((spot) {
+                                  return LineTooltipItem(
+                                    '${spot.y.toStringAsFixed(1)} kg',
+                                    const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  );
+                                }).toList();
+                              },
+                            ),
+                            touchCallback: (FlTouchEvent event,
+                                LineTouchResponse? response) {
+                              // Handle touch events if needed
+                            },
+                            handleBuiltInTouches: true,
+                          ),
                         ),
-                        touchCallback:
-                            (FlTouchEvent event, LineTouchResponse? response) {
-                          // Handle touch events if needed
-                        },
-                        handleBuiltInTouches: true,
+                      );
+                    },
+                    loading: () => const Center(
+                      child: CircularProgressIndicator(color: primaryColor),
+                    ),
+                    error: (error, _) => Center(
+                      child: WeightLogText(
+                        text: 'Error: $error',
+                        fontSize: 14,
+                        color: Colors.red,
                       ),
                     ),
                   ),
