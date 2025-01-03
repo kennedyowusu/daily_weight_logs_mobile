@@ -8,20 +8,23 @@ import 'package:flutter/material.dart';
 class HeightLogRepository {
   final String healthLogUrl = baseUrl + healthDataUrl;
 
-  Future<String?> getHealthDataIdByUserId(String userId) async {
+  Future<HeightLog?> getHealthDataByUserId(String userId) async {
     final String url = '$baseUrl/user-health-data/$userId';
-    debugPrint('Fetching healthData ID for user $userId from: $url');
+    debugPrint('Fetching healthData for user $userId from: $url');
     try {
       final response = await APIService.get(url: url);
 
+      debugPrint('Response health data log: ${response.data}');
+
       if (response.statusCode == 200) {
-        return response.data['id'];
+        return HeightLogApiResponse.fromJson(response.data)
+            .data; // Parse the response into a HeightLog object
       } else {
         debugPrint('Error Response Data: ${response.data}');
         return null;
       }
     } catch (e) {
-      debugPrint('Error fetching healthData ID: $e');
+      debugPrint('Error fetching healthData: $e');
       return null;
     }
   }

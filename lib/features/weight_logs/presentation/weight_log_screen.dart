@@ -31,7 +31,6 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // final dynamicBmi = _calculateBmi(70, 1.75);
     final weightLogState = ref.watch(weightLogControllerProvider);
     final heightLogState = ref.watch(heightLogControllerProvider);
     double? userHeight;
@@ -40,14 +39,15 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
       data: (HeightLog? heightLog) {
         // Directly access the height property from the HeightLog object
         userHeight = heightLog?.height != null
-            ? double.tryParse(heightLog!.height!)
+            ? double.tryParse(heightLog!.height!
+                .replaceAll(' m', '')) // Remove the unit of measurement
             : null;
       },
       loading: () => debugPrint('Loading height logs...'),
       error: (error, stack) => debugPrint('Error loading height logs: $error'),
     );
 
-    debugPrint('User Height from UI: $userHeight');
+    debugPrint('User Height from UI: $userHeight and: $heightLogState');
 
     final dynamicBmi = (weightLogState is AsyncData &&
             (weightLogState.value?.isNotEmpty ?? false))
@@ -131,8 +131,6 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                               )
                               .toList(),
                           onChanged: (TimeRangeOption? timeRangeOption) {
-                            // ref.read(weightLogControllerProvider.notifier).fetchWeightLogs(timeRangeOption!.value);
-
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: WeightLogText(

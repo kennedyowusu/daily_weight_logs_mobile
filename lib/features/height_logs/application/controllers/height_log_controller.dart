@@ -22,12 +22,12 @@ class HeightLogController extends StateNotifier<AsyncValue<HeightLog?>> {
       }
 
       // Step 2: Fetch the health data for the user
-      final String? healthDataId =
-          await repository.getHealthDataIdByUserId(userId);
+      final HeightLog? heightLog =
+          await repository.getHealthDataByUserId(userId);
 
-      if (healthDataId != null) {
+      if (heightLog != null) {
         // Successfully fetched health data
-        state = AsyncValue.data(HeightLog(id: int.tryParse(healthDataId)));
+        state = AsyncValue.data(heightLog);
       } else {
         // Error fetching health data
         state = AsyncValue.error(
