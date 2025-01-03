@@ -1,7 +1,6 @@
 import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/constants/images.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
-import 'package:daily_weight_logs_mobile/features/height_logs/application/controllers/height_log_controller.dart';
 import 'package:daily_weight_logs_mobile/features/weight_logs/application/weight_log_controller.dart';
 import 'package:daily_weight_logs_mobile/features/weight_logs/domain/model/time_range_option.dart';
 import 'package:daily_weight_logs_mobile/router/authenticated_routes.dart';
