@@ -1,25 +1,22 @@
 import 'dart:io';
+import 'package:daily_weight_logs_mobile/common/constants/api_response.dart';
 import 'package:daily_weight_logs_mobile/common/constants/endpoints.dart';
+import 'package:daily_weight_logs_mobile/common/utils/error_parser.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/domain/auth_model.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/domain/login_auth_request.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/domain/register_auth_model.dart';
+import 'package:daily_weight_logs_mobile/services/api_services.dart';
 import 'package:dio/dio.dart';
-import 'package:daily_weight_logs_mobile/common/constants/api_response.dart';
-import 'package:daily_weight_logs_mobile/common/utils/error_parser.dart';
 import 'package:flutter/material.dart';
 
 class AuthRepository {
-  final Dio dio;
-
-  AuthRepository(this.dio);
-
   Future<(ApiSuccess<AuthApiResponse>?, ApiError?)> login(
       LoginAuthRequest request) async {
     const loginUrl = baseUrl + loginWithEmailUrl;
     try {
-      final response = await dio.post(
-        loginUrl,
-        data: request.toJson(),
+      final response = await APIService.post(
+        url: loginUrl,
+        body: request.toJson(),
       );
 
       if (response.statusCode == 200) {
@@ -41,7 +38,6 @@ class AuthRepository {
         );
       }
     } on DioException catch (dioError) {
-      // Check if it's a socket exception
       if (dioError.error is SocketException) {
         debugPrint('SocketException: No internet connection');
         return (
@@ -52,7 +48,6 @@ class AuthRepository {
           )
         );
       }
-      // Handle other DioErrors
       debugPrint('DioException: $dioError');
       return (
         null,
@@ -62,7 +57,6 @@ class AuthRepository {
         )
       );
     } catch (e, stackTrace) {
-      // Log the error
       debugPrint('Error during login: $e');
       debugPrint('StackTrace: $stackTrace');
       return (
@@ -78,15 +72,11 @@ class AuthRepository {
   Future<(ApiSuccess<AuthApiResponse>?, ApiError?)> register(
       RegisterAuthRequest request) async {
     const registerUrl = baseUrl + signUpWithEmailUrl;
-    debugPrint('Register URL: $registerUrl');
     try {
-      final response = await dio.post(
-        registerUrl,
-        data: request.toJson(),
+      final response = await APIService.post(
+        url: registerUrl,
+        body: request.toJson(),
       );
-
-      debugPrint('Response: ${response.data}');
-      debugPrint('Response Status: ${response.statusCode}');
 
       if (response.statusCode == 201) {
         final authResponse = AuthApiResponse.fromJson(response.data);
@@ -112,7 +102,6 @@ class AuthRepository {
       debugPrint('Request Body: ${dioError.requestOptions.data}');
       debugPrint('DioException: $dioError');
 
-      // Check if it's a socket exception
       if (dioError.error is SocketException) {
         debugPrint('SocketException: No internet connection');
         return (
@@ -123,7 +112,6 @@ class AuthRepository {
           )
         );
       }
-      // Handle other DioErrors
       debugPrint('DioException: $dioError');
       return (
         null,
@@ -147,10 +135,11 @@ class AuthRepository {
 
   Future<(ApiSuccess<AuthApiResponse>?, ApiError?)> forgotPassword(
       String email) async {
+    // const forgotPasswordUrl = baseUrl + forgotPasswordEndpoint;
     try {
-      final response = await dio.post(
-        '/api/v1/forgot-password',
-        data: {'email': email},
+      final response = await APIService.post(
+        url: '',
+        body: {'email': email},
       );
 
       if (response.statusCode == 200) {
@@ -172,7 +161,6 @@ class AuthRepository {
         );
       }
     } on DioException catch (dioError) {
-      // Check if it's a socket exception
       if (dioError.error is SocketException) {
         debugPrint('SocketException: No internet connection');
         return (
@@ -183,7 +171,6 @@ class AuthRepository {
           )
         );
       }
-      // Handle other DioErrors
       debugPrint('DioException: $dioError');
       return (
         null,

@@ -2,7 +2,6 @@ import 'package:daily_weight_logs_mobile/common/utils/weight_log_secure_storage.
 import 'package:daily_weight_logs_mobile/features/authentication/domain/auth_model.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/domain/login_auth_request.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/domain/register_auth_model.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:daily_weight_logs_mobile/common/constants/api_response.dart';
@@ -114,5 +113,5 @@ final authControllerProvider =
 );
 
 final authRepositoryProvider = Provider(
-  (ref) => AuthRepository(Dio()),
+  (ref) => AuthRepository(),
 );
