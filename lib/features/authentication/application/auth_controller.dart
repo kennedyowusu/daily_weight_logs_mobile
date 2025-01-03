@@ -88,6 +88,24 @@ class AuthController extends StateNotifier<AsyncValue<AuthApiResponse?>> {
       state = AsyncValue.error(err.message, StackTrace.current);
     }
   }
+
+  Future<void> logout() async {
+    state = const AsyncLoading();
+
+    try {
+      // Clear stored access token and user ID
+      await secureStorage.deleteAccessToken();
+      await secureStorage.deleteUserId();
+
+      // Reset state to null after logout
+      state = const AsyncData(null);
+
+      debugPrint('User logged out successfully');
+    } catch (e, stackTrace) {
+      state = AsyncValue.error(e.toString(), stackTrace);
+      debugPrint('Error during logout: $e');
+    }
+  }
 }
 
 final authControllerProvider =
