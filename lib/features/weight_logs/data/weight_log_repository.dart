@@ -15,9 +15,11 @@ class WeightLogRepository {
       final response = await APIService.get(url: weightDataUrl);
 
       if (response.statusCode == 200) {
-        final decodedRes = (response.data as List)
-            .map((log) => WeightLogModel.fromJson(log))
+        // Extract the list of weight logs from the `data` key
+        final decodedRes = (response.data['data'] as List<dynamic>)
+            .map((log) => WeightLogModel.fromJson(log as Map<String, dynamic>))
             .toList();
+
         return (
           ApiSuccess<List<WeightLogModel>>(
             statusCode: response.statusCode ?? 0,
@@ -35,11 +37,12 @@ class WeightLogRepository {
         );
       }
     } catch (e) {
+      debugPrint('Error fetching weight logs: $e');
       return (
         null,
         ApiError(
           statusCode: 500,
-          message: 'Error fetching weight logs',
+          message: 'Error fetching weight logs, $e',
         )
       );
     }

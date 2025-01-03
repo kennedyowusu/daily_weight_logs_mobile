@@ -2,6 +2,7 @@ import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/constants/images.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/application/controllers/height_log_controller.dart';
+import 'package:daily_weight_logs_mobile/features/weight_logs/application/weight_log_controller.dart';
 import 'package:daily_weight_logs_mobile/features/weight_logs/domain/model/time_range_option.dart';
 import 'package:daily_weight_logs_mobile/router/authenticated_routes.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -21,17 +22,19 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
     super.initState();
     // Fetch height logs on initialization
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(heightLogControllerProvider.notifier).fetchHeightLogs();
+      // ref.read(heightLogControllerProvider.notifier).fetchHeightLogs();
+      ref.read(weightLogControllerProvider.notifier).fetchWeightLogs();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // final weightLogState = ref.watch(weightLogControllerProvider);
+    final weightLogState = ref.watch(weightLogControllerProvider);
     final heightLogState = ref.watch(heightLogControllerProvider);
     const double value = 0.0;
 
     debugPrint('Height Log State: ${heightLogState.toString()}');
+    debugPrint('Weight Log State: ${weightLogState.toString()}');
 
     return Scaffold(
       backgroundColor: secondaryColor,
