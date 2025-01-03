@@ -5,7 +5,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i3;
 
-import 'package:daily_weight_logs_mobile/common/utils/secure_storage.dart'
+import 'package:daily_weight_logs_mobile/common/utils/weight_log_secure_storage.dart'
     as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i4;

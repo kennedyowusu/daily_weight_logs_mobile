@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:daily_weight_logs_mobile/common/utils/secure_storage.dart';
+import 'package:daily_weight_logs_mobile/common/utils/weight_log_secure_storage.dart';
 
 class OnboardingController extends StateNotifier<bool> {
   final DailyWeightLogsSecureStorage storage;

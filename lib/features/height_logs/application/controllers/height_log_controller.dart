@@ -1,7 +1,8 @@
 import 'package:daily_weight_logs_mobile/common/constants/api_response.dart';
-import 'package:daily_weight_logs_mobile/common/utils/secure_storage.dart';
+import 'package:daily_weight_logs_mobile/common/utils/weight_log_secure_storage.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/data/repositories/height_log_repository.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/domain/models/height_log_model.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HeightLogController extends StateNotifier<AsyncValue<HeightLog?>> {
@@ -13,6 +14,7 @@ class HeightLogController extends StateNotifier<AsyncValue<HeightLog?>> {
   Future<void> fetchUserHeightLog() async {
     final String? userId =
         await DailyWeightLogsSecureStorage().getUserId(); // Fetch user ID
+    debugPrint('User ID: $userId');
 
     state = const AsyncLoading(); // Set state to loading
 

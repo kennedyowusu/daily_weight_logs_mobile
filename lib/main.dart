@@ -1,5 +1,5 @@
 import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
-import 'package:daily_weight_logs_mobile/common/utils/secure_storage.dart';
+import 'package:daily_weight_logs_mobile/common/utils/weight_log_secure_storage.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/presentation/login_screen.dart';
 import 'package:daily_weight_logs_mobile/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:daily_weight_logs_mobile/features/weight_logs/presentation/weight_log_screen.dart';

@@ -1,4 +1,4 @@
-import 'package:daily_weight_logs_mobile/common/utils/secure_storage.dart';
+import 'package:daily_weight_logs_mobile/common/utils/weight_log_secure_storage.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/domain/auth_model.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/domain/login_auth_request.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/domain/register_auth_model.dart';
@@ -13,28 +13,6 @@ class AuthController extends StateNotifier<AsyncValue<AuthApiResponse?>> {
       DailyWeightLogsSecureStorage();
 
   AuthController(this.repository) : super(const AsyncData(null));
-
-  /// Handle user login
-  // Future<void> login(String email, String password) async {
-  //   state = const AsyncLoading();
-
-  //   final (ApiSuccess<AuthApiResponse>? success, ApiError? error) =
-  //       await repository
-  //           .login(LoginAuthRequest(email: email, password: password));
-
-  //   if (success != null) {
-  //     // Set state to successful response
-  //     state = AsyncValue.data(success.data);
-
-  //     // Save token or user details locally (e.g., in secure storage)
-  //     if (success.data!.token != null) {
-  //       await secureStorage.storeAccessToken(success.data?.token ?? '');
-  //     }
-  //   } else if (error != null) {
-  //     // Set state to error
-  //     state = AsyncValue.error(error.message, StackTrace.current);
-  //   }
-  // }
 
   Future<AuthApiResponse?> login(String email, String password) async {
     state = const AsyncLoading();

@@ -1,6 +1,6 @@
 import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/constants/images.dart';
-import 'package:daily_weight_logs_mobile/common/utils/secure_storage.dart';
+import 'package:daily_weight_logs_mobile/common/utils/weight_log_secure_storage.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text_button.dart';
 import 'package:daily_weight_logs_mobile/features/onboarding/application/onboarding_controller.dart';
 import 'package:daily_weight_logs_mobile/features/onboarding/presentation/onboarding_slide.dart';

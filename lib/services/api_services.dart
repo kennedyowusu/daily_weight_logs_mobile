@@ -2,7 +2,7 @@ import 'package:daily_weight_logs_mobile/common/constants/app_key.dart';
 import 'package:daily_weight_logs_mobile/common/constants/endpoints.dart';
 import 'package:daily_weight_logs_mobile/common/utils/error_parser.dart';
 import 'package:daily_weight_logs_mobile/common/utils/retry_interceptor.dart';
-import 'package:daily_weight_logs_mobile/common/utils/secure_storage.dart';
+import 'package:daily_weight_logs_mobile/common/utils/weight_log_secure_storage.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/presentation/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
