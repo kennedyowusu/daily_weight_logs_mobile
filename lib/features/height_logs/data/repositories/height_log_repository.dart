@@ -15,8 +15,7 @@ class HeightLogRepository {
       final response = await APIService.get(url: url);
 
       if (response.statusCode == 200) {
-        return response
-            .data['id']; // Assuming the response contains the healthData ID
+        return response.data['id'];
       } else {
         debugPrint('Error Response Data: ${response.data}');
         return null;
@@ -24,26 +23,6 @@ class HeightLogRepository {
     } catch (e) {
       debugPrint('Error fetching healthData ID: $e');
       return null;
-    }
-  }
-
-  Future<(HeightLogApiResponse?, String?)> fetchHeightLogByHealthDataId(
-      String healthDataId) async {
-    final String url = '$healthLogUrl/$healthDataId'; // Use healthDataId
-    debugPrint('Fetching height log for healthDataId $healthDataId from: $url');
-    try {
-      final response = await APIService.get(url: url);
-
-      if (response.statusCode == 200) {
-        final apiResponse = HeightLogApiResponse.fromJson(response.data);
-        return (apiResponse, null);
-      } else {
-        debugPrint('Error Response Data: ${response.data}');
-        return (null, errorParser(response.data));
-      }
-    } catch (e) {
-      debugPrint('Error fetching height log: $e');
-      return (null, 'An unexpected error occurred: $e');
     }
   }
 

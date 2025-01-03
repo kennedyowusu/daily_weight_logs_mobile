@@ -24,7 +24,7 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
     super.initState();
     // Fetch height logs on initialization
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(heightLogControllerProvider.notifier).fetchUserHeightLog();
+      ref.read(heightLogControllerProvider.notifier).fetchUserHealthData();
       ref.read(weightLogControllerProvider.notifier).fetchWeightLogs();
     });
   }
@@ -47,10 +47,12 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
       error: (error, stack) => debugPrint('Error loading height logs: $error'),
     );
 
-    final dynamicBmi = (userHeight != null &&
-            weightLogState is AsyncData &&
+    debugPrint('User Height from UI: $userHeight');
+
+    final dynamicBmi = (weightLogState is AsyncData &&
             (weightLogState.value?.isNotEmpty ?? false))
-        ? _calculateBmi(weightLogState.value?.first.weight ?? 0, userHeight!)
+        ? _calculateBmi(
+            weightLogState.value?.first.weight ?? 0, userHeight ?? 0)
         : null;
 
     const double value = 0.0;

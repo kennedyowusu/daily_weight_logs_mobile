@@ -4,6 +4,7 @@ import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
 
 class WeightLogButton extends StatelessWidget {
+  @override
   final Key? key;
   final bool isEnabled;
   final VoidCallback? onPressed;

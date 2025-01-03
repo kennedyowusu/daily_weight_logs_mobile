@@ -9,9 +9,9 @@ class HeightLogController extends StateNotifier<AsyncValue<HeightLog?>> {
 
   HeightLogController(this.repository) : super(const AsyncData(null));
 
-  // Fetch Height Logs
-  Future<void> fetchUserHeightLog() async {
-    state = const AsyncLoading();
+  // Fetch User Health Data
+  Future<void> fetchUserHealthData() async {
+    state = const AsyncLoading(); // Set loading state
 
     try {
       // Step 1: Fetch the user ID from secure storage
@@ -21,29 +21,20 @@ class HeightLogController extends StateNotifier<AsyncValue<HeightLog?>> {
         return;
       }
 
-      // Step 2: Fetch the healthDataId for the user
+      // Step 2: Fetch the health data for the user
       final String? healthDataId =
           await repository.getHealthDataIdByUserId(userId);
-      if (healthDataId == null) {
-        state =
-            AsyncValue.error('Health data ID not found', StackTrace.current);
-        return;
-      }
 
-      // Step 3: Fetch the height log using the healthDataId
-      final (HeightLogApiResponse? apiResponse, String? errorMessage) =
-          await repository.fetchHeightLogByHealthDataId(healthDataId);
-
-      if (apiResponse != null && apiResponse.data != null) {
-        state = AsyncValue.data(
-            apiResponse.data); // Successfully fetched height log
+      if (healthDataId != null) {
+        // Successfully fetched health data
+        state = AsyncValue.data(HeightLog(id: int.tryParse(healthDataId)));
       } else {
+        // Error fetching health data
         state = AsyncValue.error(
-          errorMessage ?? 'An unexpected error occurred',
-          StackTrace.current,
-        );
+            'Failed to fetch health data.', StackTrace.current);
       }
     } catch (e, stackTrace) {
+      // Handle unexpected errors
       state = AsyncValue.error('An unexpected error occurred: $e', stackTrace);
     }
   }
