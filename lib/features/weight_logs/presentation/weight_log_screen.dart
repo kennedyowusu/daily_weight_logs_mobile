@@ -30,11 +30,9 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
   @override
   Widget build(BuildContext context) {
     final weightLogState = ref.watch(weightLogControllerProvider);
-    final heightLogState = ref.watch(heightLogControllerProvider);
     const double value = 0.0;
 
-    debugPrint('Height Log State: ${heightLogState.toString()}');
-    debugPrint('Weight Log State: ${weightLogState.toString()}');
+    debugPrint('Weight Log State: ${weightLogState.asData}');
 
     return Scaffold(
       backgroundColor: secondaryColor,
