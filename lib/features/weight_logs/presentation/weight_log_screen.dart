@@ -7,6 +7,7 @@ import 'package:daily_weight_logs_mobile/router/authenticated_routes.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class WeightLogScreen extends ConsumerStatefulWidget {
   const WeightLogScreen({super.key});
@@ -326,47 +327,95 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                 const SizedBox(height: 30),
 
                 // Weight Overview Section
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    WeightLogText(
-                      text: '72.4 kg\n17 Apr 2018',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: grayTextColor,
-                    ),
-                    WeightLogText(
-                      text: '62.5 kg',
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    WeightLogText(
-                      text: '52.0 kg\n8 Mar 2019',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: grayTextColor,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                // Progress Bar Section
-                Container(
-                  width: double.infinity,
-                  height: 3,
-                  decoration: BoxDecoration(
-                    color: grayTextColor.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(20),
+                weightLogState.when(
+                  data: (weightLogs) {
+                    if (weightLogs.isEmpty) {
+                      return const Center(
+                        child: WeightLogText(
+                          text: 'No data available',
+                          fontSize: 14,
+                          color: grayTextColor,
+                        ),
+                      );
+                    }
+
+                    // Get the most recent, highest, and lowest weight logs
+                    final latestLog =
+                        weightLogs.first; // Most recent weight log
+                    final highestLog = weightLogs.reduce((a, b) =>
+                        a.weight! > b.weight! ? a : b); // Highest weight
+                    final lowestLog = weightLogs.reduce((a, b) =>
+                        a.weight! < b.weight! ? a : b); // Lowest weight
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Display lowest weight
+                            WeightLogText(
+                              text:
+                                  '${lowestLog.weight!.toStringAsFixed(1)} kg\n${_formatDate(lowestLog.loggedAt)}',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: grayTextColor,
+                            ),
+                            // Display latest weight
+                            WeightLogText(
+                              text:
+                                  '${latestLog.weight!.toStringAsFixed(1)} kg',
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                            // Display highest weight
+                            WeightLogText(
+                              text:
+                                  '${highestLog.weight!.toStringAsFixed(1)} kg\n${_formatDate(highestLog.loggedAt)}',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: grayTextColor,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Progress Bar Section
+                        Container(
+                          width: double.infinity,
+                          height: 3,
+                          decoration: BoxDecoration(
+                            color: grayTextColor.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: LinearProgressIndicator(
+                              value: _calculateProgress(lowestLog.weight!,
+                                  highestLog.weight!, latestLog.weight!),
+                              backgroundColor: grayTextColor,
+                              valueColor:
+                                  const AlwaysStoppedAnimation(primaryColor),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                      ],
+                    );
+                  },
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(color: primaryColor),
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: const LinearProgressIndicator(
-                      value: 0.2, // 20% progress
-                      backgroundColor: grayTextColor,
-                      valueColor: AlwaysStoppedAnimation(primaryColor),
+                  error: (error, _) => Center(
+                    child: WeightLogText(
+                      text: 'Error: $error',
+                      fontSize: 14,
+                      color: Colors.red,
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 30),
 
                 // BMI Calculator Section
@@ -482,7 +531,6 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                 const SizedBox(height: 10),
 
                 // Weight Log History
-                // Weight Log History
                 Container(
                   padding: const EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
@@ -509,7 +557,7 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: const Color(0xFF1C1C1E),
+                                color: grayTextColor.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               padding: const EdgeInsets.all(16.0),
@@ -601,5 +649,27 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
     if (index == 25) return '30'; // Start of obese range
     if (index == 40) return '40'; // Maximum BMI
     return '';
+  }
+
+  String _formatDate(String? dateTime) {
+    if (dateTime == null) return 'N/A';
+
+    try {
+      // Define the input date format
+      final inputFormat = DateFormat('EEE, MMM d, yyyy h:mm a');
+      final date = inputFormat.parse(dateTime);
+
+      // Define the desired output date format
+      final outputFormat = DateFormat('d MMM yyyy');
+      return outputFormat.format(date);
+    } catch (e) {
+      // Handle any parsing errors gracefully
+      return 'Invalid date';
+    }
+  }
+
+  double _calculateProgress(int lowest, int highest, int latest) {
+    if (highest == lowest) return 0.5; // Avoid division by zero
+    return (latest - lowest) / (highest - lowest);
   }
 }
