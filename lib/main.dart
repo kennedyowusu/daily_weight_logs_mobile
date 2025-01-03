@@ -1,8 +1,6 @@
 import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/utils/weight_log_secure_storage.dart';
-import 'package:daily_weight_logs_mobile/features/authentication/presentation/login_screen.dart';
-import 'package:daily_weight_logs_mobile/features/onboarding/presentation/onboarding_screen.dart';
-import 'package:daily_weight_logs_mobile/features/weight_logs/presentation/weight_log_screen.dart';
+import 'package:daily_weight_logs_mobile/router/app_router.dart';
 import 'package:daily_weight_logs_mobile/router/authenticated_routes.dart';
 import 'package:daily_weight_logs_mobile/router/unauthenticated_routes.dart';
 import 'package:daily_weight_logs_mobile/services/api_services.dart';
@@ -56,12 +54,7 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             initialRoute: snapshot.data,
-            routes: {
-              InitialRoutes.onboardingRoute: (context) =>
-                  const OnboardingScreen(),
-              InitialRoutes.loginRoute: (context) => const LoginScreen(),
-              MainRoutes.weightLogRoute: (context) => const WeightLogScreen(),
-            },
+            onGenerateRoute: AppRouter.generateRoute, // Use the route generator
           );
         }
       },

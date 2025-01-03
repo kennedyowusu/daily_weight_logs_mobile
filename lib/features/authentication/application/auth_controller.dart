@@ -3,6 +3,7 @@ import 'package:daily_weight_logs_mobile/features/authentication/domain/auth_mod
 import 'package:daily_weight_logs_mobile/features/authentication/domain/login_auth_request.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/domain/register_auth_model.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:daily_weight_logs_mobile/common/constants/api_response.dart';
 import '../data/auth_repository.dart';
@@ -22,6 +23,16 @@ class AuthController extends StateNotifier<AsyncValue<AuthApiResponse?>> {
             .login(LoginAuthRequest(email: email, password: password));
 
     if (success != null) {
+      final authResponse = success.data;
+
+      debugPrint('User ID: ${authResponse?.user?.id}');
+
+      // Store the access token and user ID
+      if (authResponse?.token != null && authResponse?.user?.id != null) {
+        await secureStorage.storeAccessToken(authResponse!.token!);
+        await secureStorage.storeUserId(authResponse.user!.id!.toString());
+      }
+
       state = AsyncValue.data(success.data);
       return success.data;
     } else if (error != null) {

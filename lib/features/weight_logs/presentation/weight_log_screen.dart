@@ -81,13 +81,18 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    CircleAvatar(
-                      backgroundColor: Colors.white,
-                      radius: 20,
-                      child: Image.asset(
-                        weightLogoPng,
-                        width: 30,
-                        height: 30,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, MainRoutes.profileRoute);
+                      },
+                      child: CircleAvatar(
+                        backgroundColor: Colors.white,
+                        radius: 20,
+                        child: Image.asset(
+                          weightLogoPng,
+                          width: 30,
+                          height: 30,
+                        ),
                       ),
                     ),
                     Container(
