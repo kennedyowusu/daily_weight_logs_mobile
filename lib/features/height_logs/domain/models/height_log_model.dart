@@ -57,9 +57,11 @@ class HeightLog {
 }
 
 class UserId {
+  final int? id;
   final String? name;
 
   UserId({
+    this.id,
     this.name,
   });
 
@@ -68,10 +70,12 @@ class UserId {
   String toRawJson() => json.encode(toJson());
 
   factory UserId.fromJson(Map<String, dynamic> json) => UserId(
+        id: json["id"],
         name: json["name"],
       );
 
   Map<String, dynamic> toJson() => {
+        "id": id,
         "name": name,
       };
 }

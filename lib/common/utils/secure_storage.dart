@@ -4,6 +4,7 @@ class DailyWeightLogsSecureStorage {
   static const _storage = FlutterSecureStorage();
   static const _accessTokenKey = 'access_token';
   static const _userSeenOnboardingKey = 'onboarding_completed';
+  static const _userIdKey = 'user_id';
 
   Future<String> getAccessToken() {
     return _storage.read(key: _accessTokenKey).then((value) => value ?? '');
@@ -20,6 +21,18 @@ class DailyWeightLogsSecureStorage {
   Future<bool> isUserLoggedIn() async {
     final String token = await getAccessToken();
     return token.isNotEmpty;
+  }
+
+  Future<String?> getUserId() {
+    return _storage.read(key: _userIdKey);
+  }
+
+  Future<void> storeUserId(String userId) {
+    return _storage.write(key: _userIdKey, value: userId);
+  }
+
+  Future<void> deleteUserId() {
+    return _storage.delete(key: _userIdKey);
   }
 
   // Onboarding Completed Flag

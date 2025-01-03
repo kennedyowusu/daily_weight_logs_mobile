@@ -139,4 +139,32 @@ class APIService {
   }) {
     return _request(method: 'GET', url: url, queryParameters: queryParameters);
   }
+
+  static Future<Response> login({
+    required String email,
+    required String password,
+  }) {
+    return post(
+      url: 'loginUrl',
+      body: {
+        'email': email,
+        'password': password,
+      },
+    );
+  }
+
+  static Future<Response> register({
+    required String email,
+    required String password,
+    required String name,
+  }) {
+    return post(
+      url: 'registerUrl',
+      body: {
+        'email': email,
+        'password': password,
+        'name': name,
+      },
+    );
+  }
 }

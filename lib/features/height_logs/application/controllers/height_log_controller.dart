@@ -1,4 +1,5 @@
 import 'package:daily_weight_logs_mobile/common/constants/api_response.dart';
+import 'package:daily_weight_logs_mobile/common/utils/secure_storage.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/data/repositories/height_log_repository.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/domain/models/height_log_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,11 +10,14 @@ class HeightLogController extends StateNotifier<AsyncValue<HeightLog?>> {
   HeightLogController(this.repository) : super(const AsyncData(null));
 
   /// Fetch Height Logs
-  Future<void> fetchHeightLogs() async {
+  Future<void> fetchUserHeightLog() async {
+    final String? userId =
+        await DailyWeightLogsSecureStorage().getUserId(); // Fetch user ID
+
     state = const AsyncLoading(); // Set state to loading
 
     final (HeightLogApiResponse? apiResponse, String? errorMessage) =
-        await repository.fetchHeightLogs();
+        await repository.fetchHeightLogByUserId(userId ?? '');
 
     if (apiResponse != null && apiResponse.data != null) {
       state = AsyncValue.data(apiResponse.data);

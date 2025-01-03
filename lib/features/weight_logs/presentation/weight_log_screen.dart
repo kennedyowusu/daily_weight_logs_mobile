@@ -24,7 +24,7 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
     super.initState();
     // Fetch height logs on initialization
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(heightLogControllerProvider.notifier).fetchHeightLogs();
+      ref.read(heightLogControllerProvider.notifier).fetchUserHeightLog();
       ref.read(weightLogControllerProvider.notifier).fetchWeightLogs();
     });
   }
