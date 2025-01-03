@@ -16,7 +16,6 @@ class AuthRepository {
   Future<(ApiSuccess<AuthApiResponse>?, ApiError?)> login(
       LoginAuthRequest request) async {
     const loginUrl = baseUrl + loginWithEmailUrl;
-    debugPrint('Login URL: $loginUrl');
     try {
       final response = await dio.post(
         loginUrl,

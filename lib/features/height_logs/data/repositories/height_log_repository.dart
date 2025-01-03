@@ -1,20 +1,17 @@
-import 'dart:io';
+import 'package:daily_weight_logs_mobile/common/constants/api_response.dart';
 import 'package:daily_weight_logs_mobile/common/constants/endpoints.dart';
 import 'package:daily_weight_logs_mobile/common/utils/error_parser.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/domain/models/height_log_model.dart';
-import 'package:dio/dio.dart';
+import 'package:daily_weight_logs_mobile/services/api_services.dart';
+import 'package:flutter/material.dart';
 
 class HeightLogRepository {
-  final Dio dio;
-  final String combinedUrl = baseUrl + healthDataUrl;
-
-  HeightLogRepository(this.dio);
+  final String healthLogUrl = baseUrl + healthDataUrl;
 
   Future<(HeightLogApiResponse?, String?)> fetchHeightLogs() async {
-    final String healthLogUrl = combinedUrl;
-
+    debugPrint('Fetching height logs from: $healthLogUrl');
     try {
-      final response = await dio.get(healthLogUrl);
+      final response = await APIService.get(url: healthLogUrl);
 
       if (response.statusCode == 200) {
         final apiResponse = HeightLogApiResponse.fromJson(response.data);
@@ -22,87 +19,46 @@ class HeightLogRepository {
       } else {
         return (null, errorParser(response.data));
       }
-    } on DioException catch (dioError) {
-      if (dioError.error is SocketException) {
-        return (null, 'No internet connection. Please try again.');
-      }
-      return (null, 'An unexpected error occurred.');
     } catch (e) {
-      return (null, 'An unexpected error occurred.');
+      return (null, 'An unexpected error occurred: $e');
     }
   }
 
-  Future<(HeightLogApiResponse?, String?)> saveHeightLog(
+  Future<(ApiSuccess<HeightLogApiResponse>?, ApiError?)> saveHeightLog(
       HeightLog heightLog) async {
-    final String createHealthLogUrl = combinedUrl;
+    debugPrint('Saving height log to: $healthLogUrl');
     try {
-      final response = await dio.post(
-        createHealthLogUrl,
-        data: heightLog.toJson(),
+      final response = await APIService.post(
+        url: healthLogUrl,
+        body: heightLog.toJson(),
       );
 
       if (response.statusCode == 201) {
         final apiResponse = HeightLogApiResponse.fromJson(response.data);
-        return (apiResponse, null);
+        return (
+          ApiSuccess<HeightLogApiResponse>(
+            statusCode: response.statusCode!,
+            data: apiResponse,
+          ),
+          null
+        );
       } else {
-        return (null, errorParser(response.data));
+        return (
+          null,
+          ApiError(
+            statusCode: response.statusCode!,
+            message: errorParser(response.data),
+          )
+        );
       }
-    } on DioException catch (dioError) {
-      if (dioError.error is SocketException) {
-        return (null, 'No internet connection. Please try again.');
-      }
-      return (null, 'An unexpected error occurred.');
     } catch (e) {
-      return (null, 'An unexpected error occurred.');
-    }
-  }
-
-  Future<(HeightLogApiResponse?, String?)> updateHeightLog(
-      HeightLog heightLog) async {
-    final String updateHealthLogUrl = combinedUrl;
-    try {
-      final response = await dio.put(
-        updateHealthLogUrl,
-        data: heightLog.toJson(),
+      return (
+        null,
+        ApiError(
+          statusCode: 500,
+          message: 'An unexpected error occurred: $e',
+        )
       );
-
-      if (response.statusCode == 200) {
-        final apiResponse = HeightLogApiResponse.fromJson(response.data);
-        return (apiResponse, null);
-      } else {
-        return (null, errorParser(response.data));
-      }
-    } on DioException catch (dioError) {
-      if (dioError.error is SocketException) {
-        return (null, 'No internet connection. Please try again.');
-      }
-      return (null, 'An unexpected error occurred.');
-    } catch (e) {
-      return (null, 'An unexpected error occurred.');
-    }
-  }
-
-  Future<(HeightLogApiResponse?, String?)> deleteHeightLog(String id) async {
-    final String deleteHealthLogUrl = combinedUrl;
-    try {
-      final response = await dio.delete(
-        deleteHealthLogUrl,
-        queryParameters: {'id': id},
-      );
-
-      if (response.statusCode == 200) {
-        final apiResponse = HeightLogApiResponse.fromJson(response.data);
-        return (apiResponse, null);
-      } else {
-        return (null, errorParser(response.data));
-      }
-    } on DioException catch (dioError) {
-      if (dioError.error is SocketException) {
-        return (null, 'No internet connection. Please try again.');
-      }
-      return (null, 'An unexpected error occurred.');
-    } catch (e) {
-      return (null, 'An unexpected error occurred.');
     }
   }
 }

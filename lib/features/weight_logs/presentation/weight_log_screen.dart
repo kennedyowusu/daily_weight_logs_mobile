@@ -1,19 +1,37 @@
 import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/constants/images.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
+import 'package:daily_weight_logs_mobile/features/height_logs/application/controllers/height_log_controller.dart';
 import 'package:daily_weight_logs_mobile/features/weight_logs/domain/model/time_range_option.dart';
 import 'package:daily_weight_logs_mobile/router/authenticated_routes.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class WeightLogScreen extends ConsumerWidget {
+class WeightLogScreen extends ConsumerStatefulWidget {
   const WeightLogScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WeightLogScreen> createState() => _WeightLogScreenState();
+}
+
+class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch height logs on initialization
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(heightLogControllerProvider.notifier).fetchHeightLogs();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // final weightLogState = ref.watch(weightLogControllerProvider);
+    final heightLogState = ref.watch(heightLogControllerProvider);
     const double value = 0.0;
+
+    debugPrint('Height Log State: ${heightLogState.toString()}');
 
     return Scaffold(
       backgroundColor: secondaryColor,

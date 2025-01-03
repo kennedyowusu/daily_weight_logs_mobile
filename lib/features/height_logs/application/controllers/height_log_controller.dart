@@ -1,7 +1,6 @@
+import 'package:daily_weight_logs_mobile/common/constants/api_response.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/data/repositories/height_log_repository.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/domain/models/height_log_model.dart';
-import 'package:dio/dio.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HeightLogController extends StateNotifier<AsyncValue<HeightLog?>> {
@@ -9,35 +8,37 @@ class HeightLogController extends StateNotifier<AsyncValue<HeightLog?>> {
 
   HeightLogController(this.repository) : super(const AsyncData(null));
 
+  /// Fetch Height Logs
   Future<void> fetchHeightLogs() async {
-    state = const AsyncLoading();
+    state = const AsyncLoading(); // Set state to loading
 
-    final (apiResponse, errorMessage) = await repository.fetchHeightLogs();
-    if (apiResponse != null) {
+    final (HeightLogApiResponse? apiResponse, String? errorMessage) =
+        await repository.fetchHeightLogs();
+
+    if (apiResponse != null && apiResponse.data != null) {
       state = AsyncValue.data(apiResponse.data);
     } else {
-      state =
-          AsyncValue.error(errorMessage ?? 'Unknown error', StackTrace.current);
+      state = AsyncValue.error(
+        errorMessage ?? 'An unexpected error occurred',
+        StackTrace.current,
+      );
     }
   }
 
-  Future<void> saveHeightLog(double height, String weightGoal) async {
+  Future<void> saveHeightLog(String height, String weightGoal) async {
     state = const AsyncLoading();
 
-    final newHeightLog = HeightLog(
-      height: height.toString(),
-      weightGoal: weightGoal,
-    );
+    final (ApiSuccess<HeightLogApiResponse>? res, ApiError? err) =
+        await repository
+            .saveHeightLog(HeightLog(height: height, weightGoal: weightGoal));
 
-    final (apiResponse, errorMessage) =
-        await repository.saveHeightLog(newHeightLog);
-
-    if (apiResponse != null) {
-      state = AsyncValue.data(apiResponse.data);
-    } else {
-      state =
-          AsyncValue.error(errorMessage ?? 'Unknown error', StackTrace.current);
+    if (res != null) {
+      state = AsyncValue.data(res.data?.data);
+    } else if (err != null) {
+      state = AsyncValue.error(err.message, StackTrace.current);
     }
+
+    fetchHeightLogs();
   }
 
   double convertToMeters(String input, {bool isUsingFeet = false}) {
@@ -63,5 +64,5 @@ class HeightLogController extends StateNotifier<AsyncValue<HeightLog?>> {
 
 final heightLogControllerProvider =
     StateNotifierProvider<HeightLogController, AsyncValue<HeightLog?>>(
-  (ref) => HeightLogController(HeightLogRepository(Dio())),
+  (ref) => HeightLogController(HeightLogRepository()),
 );

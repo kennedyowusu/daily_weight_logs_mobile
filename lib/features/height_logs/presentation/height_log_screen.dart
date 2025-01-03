@@ -265,7 +265,10 @@ class _HeightLogScreenState extends ConsumerState<HeightLogScreen> {
 
                       await ref
                           .read(heightLogControllerProvider.notifier)
-                          .saveHeightLog(height, selectedWeightGoal!);
+                          .saveHeightLog(
+                            height.toStringAsFixed(2),
+                            selectedWeightGoal?.toLowerCase() ?? '',
+                          );
 
                       heightLogState.when(
                         data: (_) {
