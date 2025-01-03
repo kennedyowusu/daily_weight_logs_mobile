@@ -1,4 +1,5 @@
 import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
+import 'package:daily_weight_logs_mobile/common/utils/theme.dart';
 import 'package:daily_weight_logs_mobile/common/utils/weight_log_secure_storage.dart';
 import 'package:daily_weight_logs_mobile/router/app_router.dart';
 import 'package:daily_weight_logs_mobile/router/authenticated_routes.dart';
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
         } else {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
+            theme: buildThemeData(),
             initialRoute: snapshot.data,
             onGenerateRoute: AppRouter.generateRoute,
           );
