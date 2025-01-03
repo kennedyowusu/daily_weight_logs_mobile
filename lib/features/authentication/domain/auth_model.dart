@@ -19,7 +19,9 @@ class AuthApiResponse {
   factory AuthApiResponse.fromJson(Map<String, dynamic> json) =>
       AuthApiResponse(
         message: json["message"],
-        user: json["user"] == null ? null : User.fromJson(json["user"]),
+        user: json["user"]?["data"] == null
+            ? null
+            : User.fromJson(json["user"]["data"]),
         token: json["token"],
       );
 

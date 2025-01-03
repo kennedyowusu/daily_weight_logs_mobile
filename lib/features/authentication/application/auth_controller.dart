@@ -24,7 +24,9 @@ class AuthController extends StateNotifier<AsyncValue<AuthApiResponse?>> {
     if (success != null) {
       final authResponse = success.data;
 
-      debugPrint('User ID: ${authResponse?.user?.id}');
+      debugPrint('User ID: ${authResponse?.user}');
+      debugPrint('Access token: ${authResponse?.token}');
+      debugPrint('Response: ${authResponse?.toJson()}');
 
       // Store the access token and user ID
       if (authResponse?.token != null && authResponse?.user?.id != null) {
