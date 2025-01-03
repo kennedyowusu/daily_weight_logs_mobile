@@ -1,6 +1,8 @@
 import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/constants/images.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
+import 'package:daily_weight_logs_mobile/features/height_logs/application/controllers/height_log_controller.dart';
+import 'package:daily_weight_logs_mobile/features/height_logs/domain/models/height_log_model.dart';
 import 'package:daily_weight_logs_mobile/features/weight_logs/application/weight_log_controller.dart';
 import 'package:daily_weight_logs_mobile/features/weight_logs/domain/model/time_range_option.dart';
 import 'package:daily_weight_logs_mobile/router/authenticated_routes.dart';
@@ -22,17 +24,39 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
     super.initState();
     // Fetch height logs on initialization
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // ref.read(heightLogControllerProvider.notifier).fetchHeightLogs();
+      ref.read(heightLogControllerProvider.notifier).fetchHeightLogs();
       ref.read(weightLogControllerProvider.notifier).fetchWeightLogs();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    // final dynamicBmi = _calculateBmi(70, 1.75);
     final weightLogState = ref.watch(weightLogControllerProvider);
+    final heightLogState = ref.watch(heightLogControllerProvider);
+    double? userHeight;
+
+    heightLogState.when(
+      data: (HeightLog? heightLog) {
+        // Directly access the height property from the HeightLog object
+        userHeight = heightLog?.height != null
+            ? double.tryParse(heightLog!.height!)
+            : null;
+      },
+      loading: () => debugPrint('Loading height logs...'),
+      error: (error, stack) => debugPrint('Error loading height logs: $error'),
+    );
+
+    final dynamicBmi = (userHeight != null &&
+            weightLogState is AsyncData &&
+            (weightLogState.value?.isNotEmpty ?? false))
+        ? _calculateBmi(weightLogState.value?.first.weight ?? 0, userHeight!)
+        : null;
+
     const double value = 0.0;
 
     debugPrint('Weight Log State: ${weightLogState.asData}');
+    debugPrint('Height Log State: ${heightLogState.asData}');
 
     weightLogState.when(
       data: (weightLogs) {
@@ -439,11 +463,13 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                             fontWeight: FontWeight.w600,
                             color: grayTextColor.withOpacity(0.5),
                           ),
-                          const WeightLogText(
-                            text: 'You\'re Healthy',
+                          WeightLogText(
+                            text: _getBmiStatus(
+                                dynamicBmi), // Use the dynamic BMI value
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: primaryColor,
+                            color: _getBmiStatusColor(
+                                dynamicBmi), // Dynamically set color
                           ),
                           Icon(
                             Icons.more_horiz,
@@ -452,25 +478,17 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                         ],
                       ),
                       const SizedBox(height: 10),
-                      // Color-Coded Range Bar
 
+                      // Color-Coded Range Bar
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: List.generate(40, (index) {
                           // Define color ranges for BMI
-                          Color color;
-                          if (index < 10) {
-                            color = Colors.blue; // Underweight
-                          } else if (index < 18) {
-                            color = Colors.green; // Healthy
-                          } else if (index < 25) {
-                            color = Colors.yellow; // Overweight
-                          } else {
-                            color = Colors.red; // Obese
-                          }
+                          final color = _getColorForBmiIndex(index);
 
-                          // Check if the current bar represents the selected BMI
-                          bool isSelected = index == (value - 15).round();
+                          // Check if the current bar represents the user's BMI
+                          final isSelected = dynamicBmi != null &&
+                              index == (dynamicBmi - 15).round();
 
                           return Column(
                             children: [
@@ -508,6 +526,7 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                     ],
                   ),
                 ),
+
                 const SizedBox(height: 30),
 
                 // History Section
@@ -649,6 +668,39 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
     if (index == 25) return '30'; // Start of obese range
     if (index == 40) return '40'; // Maximum BMI
     return '';
+  }
+
+  Color _getColorForBmiIndex(int index) {
+    if (index < 10) {
+      return Colors.blue; // Underweight
+    } else if (index < 18) {
+      return Colors.green; // Healthy
+    } else if (index < 25) {
+      return Colors.yellow; // Overweight
+    } else {
+      return Colors.red; // Obese
+    }
+  }
+
+  String _getBmiStatus(double? bmi) {
+    if (bmi == null) return 'No Data';
+    if (bmi < 18.5) return 'Underweight';
+    if (bmi < 25) return 'Healthy';
+    if (bmi < 30) return 'Overweight';
+    return 'Obese';
+  }
+
+  Color _getBmiStatusColor(double? bmi) {
+    if (bmi == null) return grayTextColor;
+    if (bmi < 18.5) return Colors.blue;
+    if (bmi < 25) return Colors.green;
+    if (bmi < 30) return Colors.yellow;
+    return Colors.red;
+  }
+
+  double? _calculateBmi(int weight, double height) {
+    if (height == 0) return null;
+    return weight / (height * height);
   }
 
   String _formatDate(String? dateTime) {
