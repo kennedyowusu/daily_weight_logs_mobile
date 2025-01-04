@@ -35,7 +35,7 @@ class AppRouter {
       case MainRoutes.addWeightLogRoute:
         return MaterialPageRoute(builder: (_) => const AddWeightLogScreen());
       case MainRoutes.profileRoute:
-        return MaterialPageRoute(builder: (_) => const ProfileScreen());
+        return MaterialPageRoute(builder: (_) => ProfileScreen());
 
       // Undefined routes
       default:

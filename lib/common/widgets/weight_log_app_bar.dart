@@ -10,6 +10,7 @@ class WeightLogAppBar extends StatelessWidget {
     this.elevation,
     this.leading,
     this.automaticallyImplyLeading = true,
+    this.fontSize = 18,
   });
 
   final String titleText;
@@ -18,6 +19,7 @@ class WeightLogAppBar extends StatelessWidget {
   final double? elevation;
   final Widget? leading;
   final bool automaticallyImplyLeading;
+  final double fontSize;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,7 @@ class WeightLogAppBar extends StatelessWidget {
         text: titleText,
         color: textColor ?? Colors.black,
         fontWeight: FontWeight.w600,
-        fontSize: 18,
+        fontSize: fontSize,
       ),
     );
   }
