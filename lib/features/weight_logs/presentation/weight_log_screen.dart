@@ -538,89 +538,101 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                 const SizedBox(height: 10),
 
                 // Weight Log History
-                Container(
-                  padding: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: weightLogState.when(
-                    data: (weightLogs) {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: weightLogs.length,
-                        itemBuilder: (context, index) {
-                          final weightLog = weightLogs[index];
-                          final previousWeight = index < weightLogs.length - 1
-                              ? weightLogs[index + 1].weight
-                              : weightLog
-                                  .weight; // Default to current weight for the first log
-                          final weightDifference =
-                              (weightLog.weight ?? 0) - (previousWeight ?? 0);
-                          final isPositiveChange = weightDifference > 0;
-
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: grayTextColor.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              padding: const EdgeInsets.all(16.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      WeightLogText(
-                                        text: index == 0
-                                            ? 'Today'
-                                            : index == 1
-                                                ? 'Yesterday'
-                                                : weightLog.loggedAt ??
-                                                    'Unknown date',
-                                        fontSize: 14,
-                                        color: grayTextColor,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                      const SizedBox(height: 4),
-                                      WeightLogText(
-                                        text:
-                                            '${isPositiveChange ? '+' : ''}${weightDifference.toStringAsFixed(1)} kg',
-                                        fontSize: 14,
-                                        color: isPositiveChange
-                                            ? Colors.red
-                                            : Colors.green,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ],
-                                  ),
-                                  WeightLogText(
-                                    text:
-                                        '${weightLog.weight?.toStringAsFixed(1)} kg',
-                                    fontSize: 20,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    loading: () => const Center(
-                      child: CircularProgressIndicator(color: primaryColor),
+                // Weight Log History
+                SizedBox(
+                  height: MediaQuery.sizeOf(context).height *
+                      0.4, // Adjust height as needed
+                  child: Container(
+                    padding: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      color: grayTextColor.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    error: (error, _) => Center(
-                      child: WeightLogText(
-                        text: 'Error: $error',
-                        fontSize: 14,
-                        color: Colors.red,
+                    child: weightLogState.when(
+                      data: (weightLogs) {
+                        final lastFiveLogs = weightLogs.length > 5
+                            ? weightLogs.sublist(
+                                weightLogs.length - 5) // Get the last 5 items
+                            : weightLogs; // If less than 5 items, display all
+
+                        return ListView.builder(
+                          physics:
+                              const AlwaysScrollableScrollPhysics(), // Enable scrolling
+                          itemCount: lastFiveLogs.length,
+                          itemBuilder: (context, index) {
+                            final weightLog = lastFiveLogs[index];
+                            final previousWeight = index <
+                                    lastFiveLogs.length - 1
+                                ? lastFiveLogs[index + 1].weight
+                                : weightLog
+                                    .weight; // Default to current weight for the first log
+                            final weightDifference =
+                                (weightLog.weight ?? 0) - (previousWeight ?? 0);
+                            final isPositiveChange = weightDifference > 0;
+
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: secondaryColor,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: const EdgeInsets.all(16.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        WeightLogText(
+                                          text: index == 0
+                                              ? 'Today'
+                                              : index == 1
+                                                  ? 'Yesterday'
+                                                  : weightLog.loggedAt ??
+                                                      'Unknown date',
+                                          fontSize: 14,
+                                          color: grayTextColor,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        const SizedBox(height: 4),
+                                        WeightLogText(
+                                          text:
+                                              '${isPositiveChange ? '+' : ''}${weightDifference.toStringAsFixed(1)} kg',
+                                          fontSize: 14,
+                                          color: isPositiveChange
+                                              ? Colors.red
+                                              : Colors.green,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ],
+                                    ),
+                                    WeightLogText(
+                                      text:
+                                          '${weightLog.weight?.toStringAsFixed(1)} kg',
+                                      fontSize: 20,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      loading: () => const Center(
+                        child: CircularProgressIndicator(color: primaryColor),
+                      ),
+                      error: (error, _) => Center(
+                        child: WeightLogText(
+                          text: 'Error: $error',
+                          fontSize: 14,
+                          color: Colors.red,
+                        ),
                       ),
                     ),
                   ),
