@@ -1,9 +1,11 @@
 import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
+import 'package:daily_weight_logs_mobile/common/constants/images.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_app_bar.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
 import 'package:daily_weight_logs_mobile/features/weight_logs/application/weight_log_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 
 class ViewAllWeightLogs extends ConsumerStatefulWidget {
   const ViewAllWeightLogs({super.key});
@@ -44,11 +46,23 @@ class _ViewAllWeightLogsState extends ConsumerState<ViewAllWeightLogs> {
         child: weightLogState.when(
           data: (weightLogs) {
             if (weightLogs.isEmpty) {
-              return const Center(
-                child: WeightLogText(
-                  text: 'No weight logs available.',
-                  fontSize: 16,
-                  color: grayTextColor,
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      noDataSvg,
+                      width: 300,
+                      height: 300,
+                    ),
+                    const SizedBox(height: 16),
+                    WeightLogText(
+                      text: 'No weight logs available.'.toUpperCase(),
+                      fontSize: 16,
+                      color: grayTextColor,
+                    ),
+                  ],
                 ),
               );
             }

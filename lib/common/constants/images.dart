@@ -6,3 +6,5 @@ const String pageNotFound = 'assets/images/page_not_found.svg';
 const String weightLogo = 'assets/images/weight_logo.svg';
 const String weightLogoPng = 'assets/images/weight_logo.png';
 const String weightLogoWhite = 'assets/images/weight_logo_white.png';
+const String noData = 'assets/images/png/no_data.png';
+const String noDataSvg = 'assets/images/svg/no_data.svg';
