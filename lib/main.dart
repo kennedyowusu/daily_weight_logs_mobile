@@ -55,6 +55,7 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: buildThemeData(),
+            title: "Weight Logs",
             initialRoute: snapshot.data,
             onGenerateRoute: AppRouter.generateRoute,
           );
