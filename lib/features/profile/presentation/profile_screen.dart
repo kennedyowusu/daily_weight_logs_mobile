@@ -2,6 +2,7 @@ import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/constants/images.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_app_bar.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_button.dart';
+import 'package:daily_weight_logs_mobile/common/widgets/weight_log_loading_dialog.dart';
 import 'package:daily_weight_logs_mobile/features/profile/application/controller/user_profile_controller.dart';
 import 'package:daily_weight_logs_mobile/features/profile/widgets/profile_field.dart';
 import 'package:daily_weight_logs_mobile/router/unauthenticated_routes.dart';
@@ -126,10 +127,24 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       buttonTextFontWeight: FontWeight.bold,
                       isEnabled: true,
                       onPressed: () async {
+                        // Show loading dialog
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) {
+                            return const WeightLogLoadingDialog(
+                              message: 'Logging out...',
+                            );
+                          },
+                        );
+
                         // Call logout method
                         await ref
                             .read(authControllerProvider.notifier)
                             .logout();
+
+                        // Close the loading dialog after logout completes
+                        Navigator.of(context).pop();
 
                         // Navigate to login screen
                         Navigator.pushNamedAndRemoveUntil(
