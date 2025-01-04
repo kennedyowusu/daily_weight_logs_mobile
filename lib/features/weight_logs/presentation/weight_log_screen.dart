@@ -580,8 +580,29 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
 
                 // Weight Log History
                 SizedBox(
-                  height: MediaQuery.sizeOf(context).height *
-                      0.4, // Adjust height as needed
+                  height: weightLogState.when(
+                    data: (weightLogs) {
+                      if (weightLogs.isEmpty) {
+                        return MediaQuery.sizeOf(context).height * 0.08;
+                      }
+                      if (weightLogs.length == 1) {
+                        return MediaQuery.sizeOf(context).height * 0.1;
+                      }
+                      if (weightLogs.length == 2) {
+                        return MediaQuery.sizeOf(context).height * 0.2;
+                      }
+                      if (weightLogs.length == 3) {
+                        return MediaQuery.sizeOf(context).height * 0.35;
+                      }
+                      if (weightLogs.length == 4) {
+                        return MediaQuery.sizeOf(context).height * 0.4;
+                      }
+                      return MediaQuery.sizeOf(context).height *
+                          0.5; // Default height for 5+ logs
+                    },
+                    loading: () => MediaQuery.sizeOf(context).height * 0.2,
+                    error: (_, __) => MediaQuery.sizeOf(context).height * 0.2,
+                  ),
                   child: Container(
                     padding: const EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
@@ -590,6 +611,16 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                     ),
                     child: weightLogState.when(
                       data: (weightLogs) {
+                        if (weightLogs.isEmpty) {
+                          return const Center(
+                            child: WeightLogText(
+                              text: 'No weight logs available.',
+                              fontSize: 16,
+                              color: grayTextColor,
+                            ),
+                          );
+                        }
+
                         final lastFiveLogs = weightLogs.length > 5
                             ? weightLogs.sublist(
                                 weightLogs.length - 5) // Get the last 5 items

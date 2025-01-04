@@ -1,5 +1,6 @@
 import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_app_bar.dart';
+import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
 import 'package:daily_weight_logs_mobile/features/weight_logs/application/weight_log_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,12 +45,10 @@ class _ViewAllWeightLogsState extends ConsumerState<ViewAllWeightLogs> {
           data: (weightLogs) {
             if (weightLogs.isEmpty) {
               return const Center(
-                child: Text(
-                  'No weight logs available.',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
+                child: WeightLogText(
+                  text: 'No weight logs available.',
+                  fontSize: 16,
+                  color: grayTextColor,
                 ),
               );
             }
