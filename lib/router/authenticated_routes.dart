@@ -3,4 +3,5 @@ class MainRoutes {
   static const String weightLogRoute = '/weight-logs';
   static const String addWeightLogRoute = '/add-weight-log';
   static const String profileRoute = '/profile';
+  static const String viewAllWeightLogsRoute = '/view-all-weight-logs';
 }

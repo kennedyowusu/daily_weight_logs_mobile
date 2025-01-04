@@ -6,6 +6,7 @@ import 'package:daily_weight_logs_mobile/features/not_found/presentation/not_fou
 import 'package:daily_weight_logs_mobile/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:daily_weight_logs_mobile/features/profile/presentation/profile_screen.dart';
 import 'package:daily_weight_logs_mobile/features/weight_logs/presentation/add_weight_log.dart';
+import 'package:daily_weight_logs_mobile/features/weight_logs/presentation/view_all_weight_logs.dart';
 import 'package:daily_weight_logs_mobile/features/weight_logs/presentation/weight_log_screen.dart';
 import 'package:daily_weight_logs_mobile/router/unauthenticated_routes.dart';
 import 'package:daily_weight_logs_mobile/router/authenticated_routes.dart';
@@ -35,7 +36,9 @@ class AppRouter {
       case MainRoutes.addWeightLogRoute:
         return MaterialPageRoute(builder: (_) => const AddWeightLogScreen());
       case MainRoutes.profileRoute:
-        return MaterialPageRoute(builder: (_) => ProfileScreen());
+        return MaterialPageRoute(builder: (_) => const ProfileScreen());
+      case MainRoutes.viewAllWeightLogsRoute:
+        return MaterialPageRoute(builder: (_) => const ViewAllWeightLogs());
 
       // Undefined routes
       default:

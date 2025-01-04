@@ -1,6 +1,7 @@
 import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/constants/images.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
+import 'package:daily_weight_logs_mobile/features/authentication/widgets/weight_log_button_text.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/application/controllers/height_log_controller.dart';
 import 'package:daily_weight_logs_mobile/features/height_logs/domain/models/height_log_model.dart';
 import 'package:daily_weight_logs_mobile/features/weight_logs/application/weight_log_controller.dart';
@@ -527,12 +528,16 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                       fontWeight: FontWeight.w600,
                       color: grayTextColor,
                     ),
-                    WeightLogText(
-                      text: 'See All',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: primaryColor,
-                    ),
+                    WeightLogButtonText(
+                      mainText: 'See All',
+                      actionText: 'All Logs',
+                      route: MainRoutes.viewAllWeightLogsRoute,
+                      actionTextStyle: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: primaryColor,
+                      ),
+                    )
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -601,7 +606,7 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                                         const SizedBox(height: 4),
                                         WeightLogText(
                                           text:
-                                              '${isPositiveChange ? '+' : ''}${weightDifference.toStringAsFixed(1)} kg',
+                                              '${isPositiveChange ? ' ↑ ' : ''}${weightDifference.toStringAsFixed(1)} kg',
                                           fontSize: 14,
                                           color: isPositiveChange
                                               ? Colors.red
