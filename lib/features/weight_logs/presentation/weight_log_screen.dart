@@ -160,7 +160,6 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
 
                 // Graph Section
                 Container(
-                  height: 200,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: grayTextColor.withOpacity(0.2),
@@ -168,49 +167,42 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                   ),
                   child: weightLogState.when(
                     data: (weightLogs) {
-                      // Filter weight logs based on selected time range
+                      // Prepare graph data
                       List<FlSpot> graphSpots = [];
                       List<String> logLabels = [];
                       final now = DateTime.now();
-
-                      // Define the date format used in your loggedAt values
                       final DateFormat inputDateFormat =
                           DateFormat('EEE, MMM d, yyyy h:mm a');
 
                       final filteredLogs = weightLogs.where((log) {
                         try {
-                          // Parse the loggedAt date using the correct format
                           final logDate = inputDateFormat.parse(log.loggedAt!);
 
-                          // Filter logs based on the selected time range
                           if (selectedTimeRange.value == 'today') {
                             return logDate
-                                .isAfter(now.subtract(Duration(days: 1)));
+                                .isAfter(now.subtract(const Duration(days: 1)));
                           } else if (selectedTimeRange.value == 'last_week') {
                             return logDate
-                                .isAfter(now.subtract(Duration(days: 7)));
+                                .isAfter(now.subtract(const Duration(days: 7)));
                           }
                         } catch (e) {
                           debugPrint(
                               'Error parsing date: ${log.loggedAt} - $e');
-                          return false; // Skip this log if parsing fails
+                          return false;
                         }
-                        return false; // Default to false if no range is matched
+                        return false;
                       }).toList();
 
-                      // Prepare data for the graph
                       for (int i = 0; i < filteredLogs.length; i++) {
                         final log = filteredLogs[i];
                         try {
-                          // Use inputDateFormat to parse the loggedAt date
                           final parsedDate =
                               inputDateFormat.parse(log.loggedAt!);
-                          logLabels.add(DateFormat('MMM d')
-                              .format(parsedDate)); // Format for display
+                          logLabels.add(DateFormat('MMM d').format(parsedDate));
                           graphSpots.add(
                             FlSpot(
-                              i.toDouble(), // X-axis based on log order
-                              log.weight!.toDouble(), // Y-axis based on weight
+                              i.toDouble(),
+                              log.weight!.toDouble(),
                             ),
                           );
                         } catch (e) {
@@ -219,131 +211,153 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                         }
                       }
 
-                      return LineChart(
-                        LineChartData(
-                          minX: 0,
-                          maxX:
-                              graphSpots.isNotEmpty ? graphSpots.length - 1 : 1,
-                          minY: graphSpots.isNotEmpty
-                              ? graphSpots
-                                      .map((spot) => spot.y)
-                                      .reduce((a, b) => a < b ? a : b) -
-                                  5
-                              : 50,
-                          maxY: graphSpots.isNotEmpty
-                              ? graphSpots
-                                      .map((spot) => spot.y)
-                                      .reduce((a, b) => a > b ? a : b) +
-                                  5
-                              : 300,
-                          gridData: FlGridData(
-                            show: true,
-                            drawVerticalLine: true,
-                            drawHorizontalLine: true,
-                            horizontalInterval: 50,
-                            verticalInterval: 1,
-                            getDrawingHorizontalLine: (value) {
-                              return FlLine(
-                                color: grayTextColor.withOpacity(0.5),
-                                strokeWidth: 1,
-                              );
-                            },
-                            getDrawingVerticalLine: (value) {
-                              return FlLine(
-                                color: grayTextColor.withOpacity(0.5),
-                                strokeWidth: 1,
-                              );
-                            },
-                          ),
-                          titlesData: FlTitlesData(
-                            rightTitles: const AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: false,
-                              ),
-                            ),
-                            topTitles: const AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: false,
-                              ),
-                            ),
-                            leftTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                reservedSize: 40,
-                                interval: 50,
-                                getTitlesWidget: (value, meta) {
-                                  return WeightLogText(
-                                    text: '${value.toInt()} kg',
-                                    fontSize: 10,
+                      final containerHeight = graphSpots.isEmpty ? 40.0 : 150.0;
+
+                      return SizedBox(
+                        height: containerHeight,
+                        child: graphSpots.isEmpty
+                            ? Center(
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: secondaryColor,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const WeightLogText(
+                                    text: 'No data available for this period',
+                                    fontSize: 14,
                                     color: grayTextColor,
-                                  );
-                                },
-                              ),
-                            ),
-                            bottomTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                interval: 1,
-                                getTitlesWidget: (value, meta) {
-                                  final index = value.toInt();
-                                  if (index >= 0 && index < logLabels.length) {
-                                    return WeightLogText(
-                                      text: logLabels[index],
-                                      fontSize: 12,
-                                      color: grayTextColor,
-                                    );
-                                  }
-                                  return const SizedBox.shrink();
-                                },
-                              ),
-                            ),
-                          ),
-                          borderData: FlBorderData(show: false),
-                          lineBarsData: [
-                            LineChartBarData(
-                              spots: graphSpots,
-                              isCurved: true,
-                              color: primaryColor,
-                              barWidth: 3,
-                              isStrokeCapRound: true,
-                              dotData: FlDotData(show: true),
-                              belowBarData: BarAreaData(
-                                show: true,
-                                gradient: LinearGradient(
-                                  colors: [
-                                    primaryColor.withOpacity(0.2),
-                                    Colors.transparent,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              )
+                            : LineChart(
+                                LineChartData(
+                                  minX: 0,
+                                  maxX: graphSpots.isNotEmpty
+                                      ? graphSpots.length - 1
+                                      : 1,
+                                  minY: graphSpots.isNotEmpty
+                                      ? graphSpots
+                                              .map((spot) => spot.y)
+                                              .reduce((a, b) => a < b ? a : b) -
+                                          5
+                                      : 50,
+                                  maxY: graphSpots.isNotEmpty
+                                      ? graphSpots
+                                              .map((spot) => spot.y)
+                                              .reduce((a, b) => a > b ? a : b) +
+                                          5
+                                      : 300,
+                                  gridData: FlGridData(
+                                    show: true,
+                                    drawVerticalLine: true,
+                                    drawHorizontalLine: true,
+                                    horizontalInterval: 50,
+                                    verticalInterval: 1,
+                                    getDrawingHorizontalLine: (value) {
+                                      return FlLine(
+                                        color: grayTextColor.withOpacity(0.5),
+                                        strokeWidth: 1,
+                                      );
+                                    },
+                                    getDrawingVerticalLine: (value) {
+                                      return FlLine(
+                                        color: grayTextColor.withOpacity(0.5),
+                                        strokeWidth: 1,
+                                      );
+                                    },
+                                  ),
+                                  titlesData: FlTitlesData(
+                                    rightTitles: const AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: false,
+                                      ),
+                                    ),
+                                    topTitles: const AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: false,
+                                      ),
+                                    ),
+                                    leftTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: true,
+                                        reservedSize: 40,
+                                        interval: 50,
+                                        getTitlesWidget: (value, meta) {
+                                          return WeightLogText(
+                                            text: '${value.toInt()} kg',
+                                            fontSize: 10,
+                                            color: grayTextColor,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    bottomTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: true,
+                                        interval: 1,
+                                        getTitlesWidget: (value, meta) {
+                                          final index = value.toInt();
+                                          if (index >= 0 &&
+                                              index < logLabels.length) {
+                                            return WeightLogText(
+                                              text: logLabels[index],
+                                              fontSize: 12,
+                                              color: grayTextColor,
+                                            );
+                                          }
+                                          return const SizedBox.shrink();
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  borderData: FlBorderData(show: false),
+                                  lineBarsData: [
+                                    LineChartBarData(
+                                      spots: graphSpots,
+                                      isCurved: true,
+                                      color: primaryColor,
+                                      barWidth: 3,
+                                      isStrokeCapRound: true,
+                                      dotData: const FlDotData(show: true),
+                                      belowBarData: BarAreaData(
+                                        show: true,
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            primaryColor.withOpacity(0.2),
+                                            Colors.transparent,
+                                          ],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                        ),
+                                      ),
+                                    ),
                                   ],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
+                                  lineTouchData: LineTouchData(
+                                    touchTooltipData: LineTouchTooltipData(
+                                      getTooltipColor: (spot) => secondaryColor,
+                                      getTooltipItems:
+                                          (List<LineBarSpot> touchedSpots) {
+                                        return touchedSpots.map((spot) {
+                                          return LineTooltipItem(
+                                            '${spot.y.toStringAsFixed(1)} kg',
+                                            const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          );
+                                        }).toList();
+                                      },
+                                    ),
+                                    touchCallback: (FlTouchEvent event,
+                                        LineTouchResponse? response) {},
+                                    handleBuiltInTouches: true,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                          lineTouchData: LineTouchData(
-                            touchTooltipData: LineTouchTooltipData(
-                              getTooltipColor: (spot) => secondaryColor,
-                              getTooltipItems:
-                                  (List<LineBarSpot> touchedSpots) {
-                                return touchedSpots.map((spot) {
-                                  return LineTooltipItem(
-                                    '${spot.y.toStringAsFixed(1)} kg',
-                                    const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  );
-                                }).toList();
-                              },
-                            ),
-                            touchCallback: (FlTouchEvent event,
-                                LineTouchResponse? response) {
-                              // Handle touch events if needed
-                            },
-                            handleBuiltInTouches: true,
-                          ),
-                        ),
                       );
                     },
                     loading: () => const Center(
