@@ -44,6 +44,7 @@ dependencies:
   calendar_date_picker2: ^1.1.8
   fl_chart: ^0.69.2
   intl: ^0.20.1
+  connectivity_plus: ^6.1.1
 
 dev_dependencies:
   flutter_test:
