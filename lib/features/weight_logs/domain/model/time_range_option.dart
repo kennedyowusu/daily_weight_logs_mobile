@@ -6,7 +6,6 @@ class TimeRangeOption {
 }
 
 final List<TimeRangeOption> timeRangeOptions = [
+  TimeRangeOption(label: 'Today', value: 'today'),
   TimeRangeOption(label: 'Last week', value: 'last_week'),
-  TimeRangeOption(label: 'Last month', value: 'last_month'),
-  TimeRangeOption(label: 'Last 6 months', value: 'last_6_months'),
 ];

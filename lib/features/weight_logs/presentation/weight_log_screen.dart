@@ -20,6 +20,9 @@ class WeightLogScreen extends ConsumerStatefulWidget {
 }
 
 class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
+  // Track the selected time range
+  TimeRangeOption selectedTimeRange = timeRangeOptions[0];
+
   @override
   void initState() {
     super.initState();
@@ -56,8 +59,6 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
             weightLogState.value?.first.weight ?? 0, userHeight ?? 0)
         : null;
 
-    const double value = 0.0;
-
     debugPrint('Weight Log State: ${weightLogState.asData}');
     debugPrint('Height Log State: ${heightLogState.asData}');
 
@@ -81,6 +82,7 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Top Section: Profile Picture and Dropdown
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -116,7 +118,7 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                       child: DropdownButtonHideUnderline(
                         key: const Key('weightLogDropdown'),
                         child: DropdownButton<TimeRangeOption>(
-                          value: timeRangeOptions[0],
+                          value: selectedTimeRange,
                           key: const Key('weightLogDropdownButton'),
                           items: timeRangeOptions
                               .map(
@@ -132,17 +134,9 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                               )
                               .toList(),
                           onChanged: (TimeRangeOption? timeRangeOption) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: WeightLogText(
-                                  text:
-                                      'Fetching weight logs for ${timeRangeOption!.label}',
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                ),
-                                backgroundColor: secondaryColor,
-                              ),
-                            );
+                            setState(() {
+                              selectedTimeRange = timeRangeOption!;
+                            });
                           },
                           dropdownColor: secondaryColor,
                           style: const TextStyle(color: Colors.white),
@@ -174,29 +168,74 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                   ),
                   child: weightLogState.when(
                     data: (weightLogs) {
-                      // Prepare data for the graph
+                      // Filter weight logs based on selected time range
                       List<FlSpot> graphSpots = [];
                       List<String> logLabels = [];
+                      final now = DateTime.now();
 
-                      for (int i = 0; i < weightLogs.length; i++) {
-                        final log = weightLogs[i];
-                        logLabels.add(
-                            'Log ${i + 1}'); // Add labels like "Log 1", "Log 2", etc.
+                      // Define the date format used in your loggedAt values
+                      final DateFormat inputDateFormat =
+                          DateFormat('EEE, MMM d, yyyy h:mm a');
 
-                        graphSpots.add(
-                          FlSpot(
-                            i.toDouble(), // X-axis based on log order
-                            log.weight!.toDouble(), // Y-axis based on weight
-                          ),
-                        );
+                      final filteredLogs = weightLogs.where((log) {
+                        try {
+                          // Parse the loggedAt date using the correct format
+                          final logDate = inputDateFormat.parse(log.loggedAt!);
+
+                          // Filter logs based on the selected time range
+                          if (selectedTimeRange.value == 'today') {
+                            return logDate
+                                .isAfter(now.subtract(Duration(days: 1)));
+                          } else if (selectedTimeRange.value == 'last_week') {
+                            return logDate
+                                .isAfter(now.subtract(Duration(days: 7)));
+                          }
+                        } catch (e) {
+                          debugPrint(
+                              'Error parsing date: ${log.loggedAt} - $e');
+                          return false; // Skip this log if parsing fails
+                        }
+                        return false; // Default to false if no range is matched
+                      }).toList();
+
+                      // Prepare data for the graph
+                      for (int i = 0; i < filteredLogs.length; i++) {
+                        final log = filteredLogs[i];
+                        try {
+                          // Use inputDateFormat to parse the loggedAt date
+                          final parsedDate =
+                              inputDateFormat.parse(log.loggedAt!);
+                          logLabels.add(DateFormat('MMM d')
+                              .format(parsedDate)); // Format for display
+                          graphSpots.add(
+                            FlSpot(
+                              i.toDouble(), // X-axis based on log order
+                              log.weight!.toDouble(), // Y-axis based on weight
+                            ),
+                          );
+                        } catch (e) {
+                          debugPrint(
+                              'Error parsing date for log ${log.loggedAt}: $e');
+                        }
                       }
 
                       return LineChart(
                         LineChartData(
-                          minX: 0, // Start of x-axis
-                          maxX: weightLogs.length - 1, // End of x-axis
-                          minY: 50, // Minimum y-axis value
-                          maxY: 300, // Maximum y-axis value
+                          minX: 0,
+                          maxX:
+                              graphSpots.isNotEmpty ? graphSpots.length - 1 : 1,
+                          minY: graphSpots.isNotEmpty
+                              ? graphSpots
+                                      .map((spot) => spot.y)
+                                      .reduce((a, b) => a < b ? a : b) -
+                                  5
+                              : 50,
+                          maxY: graphSpots.isNotEmpty
+                              ? graphSpots
+                                      .map((spot) => spot.y)
+                                      .reduce((a, b) => a > b ? a : b) +
+                                  5
+                              : 300,
                           gridData: FlGridData(
                             show: true,
                             drawVerticalLine: true,
@@ -267,24 +306,7 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                               color: primaryColor,
                               barWidth: 3,
                               isStrokeCapRound: true,
-                              dotData: FlDotData(
-                                show: true,
-                                getDotPainter: (spot, percent, barData, index) {
-                                  if (index == graphSpots.length - 1) {
-                                    return FlDotCirclePainter(
-                                      radius: 6,
-                                      color: primaryColor,
-                                      strokeWidth: 2,
-                                      strokeColor: Colors.white,
-                                    ); // Highlight the last point
-                                  }
-                                  return FlDotCirclePainter(
-                                    radius: 5,
-                                    color: primaryColor,
-                                    strokeWidth: 0,
-                                  );
-                                },
-                              ),
+                              dotData: FlDotData(show: true),
                               belowBarData: BarAreaData(
                                 show: true,
                                 gradient: LinearGradient(
@@ -542,7 +564,6 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                 ),
                 const SizedBox(height: 10),
 
-                // Weight Log History
                 // Weight Log History
                 SizedBox(
                   height: MediaQuery.sizeOf(context).height *
