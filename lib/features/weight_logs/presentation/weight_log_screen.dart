@@ -38,6 +38,7 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
     final weightLogState = ref.watch(weightLogControllerProvider);
     final heightLogState = ref.watch(heightLogControllerProvider);
     double? userHeight;
+    const int totalBmiBars = 40;
 
     heightLogState.when(
       data: (HeightLog? heightLog) {
@@ -505,9 +506,11 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                       const SizedBox(height: 10),
 
                       // Color-Coded Range Bar
+                      // Define the static number of bars for the BMI scale
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: List.generate(25, (index) {
+                        children: List.generate(totalBmiBars, (index) {
                           // Define color ranges for BMI
                           final color = _getColorForBmiIndex(index);
 
