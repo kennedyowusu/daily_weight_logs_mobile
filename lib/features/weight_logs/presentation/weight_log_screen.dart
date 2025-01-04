@@ -470,7 +470,7 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                       // Color-Coded Range Bar
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: List.generate(40, (index) {
+                        children: List.generate(25, (index) {
                           // Define color ranges for BMI
                           final color = _getColorForBmiIndex(index);
 
