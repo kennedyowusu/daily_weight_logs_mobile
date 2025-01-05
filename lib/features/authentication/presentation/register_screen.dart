@@ -285,6 +285,7 @@ class RegisterForm extends ConsumerWidget {
                 actionText: 'Sign in',
                 route: InitialRoutes.loginRoute,
               ),
+              const SizedBox(height: 16),
             ],
           ),
         ),
