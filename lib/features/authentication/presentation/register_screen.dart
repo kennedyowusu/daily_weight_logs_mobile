@@ -170,6 +170,35 @@ class RegisterForm extends ConsumerWidget {
                   return null;
                 },
               ),
+
+              const SizedBox(height: 16),
+
+              Row(
+                children: [
+                  Checkbox(
+                    value: true,
+                    onChanged: (value) {},
+                    activeColor: secondaryColor,
+                  ),
+                  const WeightLogText(
+                    text: 'I agree to the ',
+                    color: grayTextColor,
+                  ),
+                  WeightLogText(
+                    text: 'Terms of Service',
+                    color: secondaryColor,
+                  ),
+                  const WeightLogText(
+                    text: ' and ',
+                    color: grayTextColor,
+                  ),
+                  WeightLogText(
+                    text: 'Privacy Policy',
+                    color: secondaryColor,
+                  ),
+                ],
+              ),
+
               const SizedBox(height: 24),
 
               // Register Button
