@@ -32,6 +32,9 @@ class RegisterForm extends ConsumerWidget {
       TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
+  // State for password visibility
+  final bool isPasswordVisible = false;
+
   RegisterForm({super.key});
 
   @override
@@ -138,7 +141,7 @@ class RegisterForm extends ConsumerWidget {
                 hintText: 'Enter your password',
                 labelText: 'Password',
                 inputTextColor: secondaryColor,
-                obscureText: true,
+                obscureText: !isPasswordVisible,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your password';
@@ -159,7 +162,7 @@ class RegisterForm extends ConsumerWidget {
                 hintText: 'Confirm your password',
                 labelText: 'Confirm Password',
                 inputTextColor: secondaryColor,
-                obscureText: true,
+                obscureText: !isPasswordVisible,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please confirm your password';
