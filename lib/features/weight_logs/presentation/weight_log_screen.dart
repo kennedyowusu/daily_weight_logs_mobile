@@ -471,7 +471,8 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                 // BMI Calculator Section
                 Container(
                   width: double.infinity,
-                  height: MediaQuery.sizeOf(context).height * 0.12,
+                  // height: MediaQuery.sizeOf(context).height * 0.12,
+                  height: 125,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: grayTextColor.withOpacity(0.2),
