@@ -1,7 +1,8 @@
+import 'package:daily_weight_logs_mobile/common/constants/colors.dart';
 import 'package:daily_weight_logs_mobile/common/utils/input_decoration.dart';
 import 'package:flutter/material.dart';
 
-class WeightLogInputField extends StatelessWidget {
+class WeightLogInputField extends StatefulWidget {
   final TextEditingController controller;
   final String hintText;
   final String labelText;
@@ -26,22 +27,47 @@ class WeightLogInputField extends StatelessWidget {
   });
 
   @override
+  State<WeightLogInputField> createState() => _WeightLogInputFieldState();
+}
+
+class _WeightLogInputFieldState extends State<WeightLogInputField> {
+  late bool isObscured;
+
+  @override
+  void initState() {
+    super.initState();
+    isObscured = widget.obscureText;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return TextFormField(
-      keyboardType: keyboardType,
-      textInputAction: textInputAction,
-      controller: controller,
-      obscureText: obscureText,
+      keyboardType: widget.keyboardType,
+      textInputAction: widget.textInputAction,
+      controller: widget.controller,
+      obscureText: isObscured,
       decoration: customInputDecoration(
-        hintText: hintText,
-        suffixIcon: suffixIcon,
+        hintText: widget.hintText,
+        suffixIcon: widget.obscureText
+            ? IconButton(
+                icon: Icon(
+                  isObscured ? Icons.visibility : Icons.visibility_off,
+                  color: grayTextColor,
+                ),
+                onPressed: () {
+                  setState(() {
+                    isObscured = !isObscured;
+                  });
+                },
+              )
+            : null,
       ),
       style: TextStyle(
-        color: inputTextColor,
+        color: widget.inputTextColor,
         fontSize: 16,
         fontWeight: FontWeight.w500,
       ),
-      validator: validator,
+      validator: widget.validator,
     );
   }
 }
