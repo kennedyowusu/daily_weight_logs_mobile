@@ -38,7 +38,7 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
     final weightLogState = ref.watch(weightLogControllerProvider);
     final heightLogState = ref.watch(heightLogControllerProvider);
     double? userHeight;
-    const int totalBmiBars = 40;
+    const int totalBmiBars = 30;
 
     heightLogState.when(
       data: (HeightLog? heightLog) {
@@ -589,7 +589,7 @@ class _WeightLogScreenState extends ConsumerState<WeightLogScreen> {
                         return MediaQuery.sizeOf(context).height * 0.08;
                       }
                       if (weightLogs.length == 1) {
-                        return MediaQuery.sizeOf(context).height * 0.1;
+                        return MediaQuery.sizeOf(context).height * 0.13;
                       }
                       if (weightLogs.length == 2) {
                         return MediaQuery.sizeOf(context).height * 0.2;
