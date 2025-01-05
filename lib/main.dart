@@ -52,7 +52,7 @@ class MyApp extends ConsumerWidget {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: buildThemeData(),
-        title: "Weight Logs",
+        title: "WeightMetrics",
         home: const NoInternetScreen(),
       );
     }
@@ -70,7 +70,7 @@ class MyApp extends ConsumerWidget {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: buildThemeData(),
-            title: "Weight Logs",
+            title: "WeightMetrics",
             initialRoute: snapshot.data,
             onGenerateRoute: AppRouter.generateRoute,
           );
