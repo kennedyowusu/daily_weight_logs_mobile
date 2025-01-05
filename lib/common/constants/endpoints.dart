@@ -1,4 +1,5 @@
-const String baseUrl = 'http://0.0.0.0:80/api/v1';
+// const String baseUrl = 'http://0.0.0.0:80/api/v1';
+const String baseUrl = 'https://weightlogapi.kennedyowusu.com/api/v1';
 
 const String loginWithEmailUrl = '/login';
 const String signUpWithEmailUrl = '/register';
