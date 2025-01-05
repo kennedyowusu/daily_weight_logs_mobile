@@ -139,7 +139,6 @@ class RegisterForm extends ConsumerWidget {
                 labelText: 'Password',
                 inputTextColor: secondaryColor,
                 obscureText: true,
-                suffixIcon: const Icon(Icons.visibility_off),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your password';
@@ -161,7 +160,6 @@ class RegisterForm extends ConsumerWidget {
                 labelText: 'Confirm Password',
                 inputTextColor: secondaryColor,
                 obscureText: true,
-                suffixIcon: const Icon(Icons.visibility_off),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please confirm your password';

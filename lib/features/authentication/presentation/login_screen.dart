@@ -93,7 +93,6 @@ class LoginFormState extends ConsumerState<LoginForm> {
               labelText: 'Password',
               obscureText: true,
               inputTextColor: secondaryColor,
-              suffixIcon: const Icon(Icons.visibility_off),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your password';

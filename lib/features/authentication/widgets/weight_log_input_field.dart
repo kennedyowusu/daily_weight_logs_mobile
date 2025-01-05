@@ -51,7 +51,7 @@ class _WeightLogInputFieldState extends State<WeightLogInputField> {
         suffixIcon: widget.obscureText
             ? IconButton(
                 icon: Icon(
-                  isObscured ? Icons.visibility : Icons.visibility_off,
+                  isObscured ? Icons.visibility_off : Icons.visibility,
                   color: grayTextColor,
                 ),
                 onPressed: () {
