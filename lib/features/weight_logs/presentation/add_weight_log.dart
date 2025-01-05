@@ -19,11 +19,14 @@ class AddWeightLogScreen extends ConsumerStatefulWidget {
 
 class _AddWeightLogScreenState extends ConsumerState<AddWeightLogScreen> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  DateTime? selectedDate = DateTime.now();
   final TextEditingController weightController = TextEditingController();
-  String? selectedTimeOfDay;
 
+  DateTime? selectedDate = DateTime.now();
+  String? selectedTimeOfDay;
   bool isLogExisting = false;
+
+  // Current date (today)
+  final DateTime today = DateTime.now();
 
   void checkIfLogExists(BuildContext context) {
     final weightLogs =
@@ -61,6 +64,34 @@ class _AddWeightLogScreenState extends ConsumerState<AddWeightLogScreen> {
     }
   }
 
+  void handleDateSelection(BuildContext context, DateTime? date) {
+    if (date == null) return;
+
+    // Check if the selected date is today
+    if (date.year != today.year ||
+        date.month != today.month ||
+        date.day != today.day) {
+      // Reset the selection and show a warning
+      setState(() {
+        selectedDate = today; // Reset the selected date to today
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'You can only log weight for today\'s date.',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      setState(() {
+        selectedDate = date;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,74 +123,37 @@ class _AddWeightLogScreenState extends ConsumerState<AddWeightLogScreen> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 0),
+
                   CalendarDatePicker2(
                     key: const Key('calendarDatePicker'),
                     config: CalendarDatePicker2Config(
-                      // Customize year
-                      yearTextStyle: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      selectedYearTextStyle: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      yearBorderRadius: BorderRadius.circular(12),
-
-                      // Customize month
-                      nextMonthIcon: const Icon(
-                        Icons.arrow_forward_ios,
-                        color: Colors.white,
-                      ),
-                      lastMonthIcon: const Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.white,
-                      ),
-                      selectedMonthTextStyle: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      monthTextStyle: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      monthBorderRadius: BorderRadius.circular(12),
-
-                      // Customize the day of the week
                       weekdayLabelTextStyle: const TextStyle(
-                        color: primaryColor,
+                        color: Colors.white,
                         fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
-
-                      // Customize day
+                      calendarType: CalendarDatePicker2Type.single,
+                      currentDate: today,
                       dayTextStyle: const TextStyle(
                         color: grayTextColor,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
+                      selectedDayHighlightColor: primaryColor.withOpacity(0.5),
                       selectedDayTextStyle: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
-                      currentDate: DateTime.now(),
-                      selectedDayHighlightColor: primaryColor.withOpacity(0.5),
-
-                      calendarType: CalendarDatePicker2Type.single,
+                      disabledDayTextStyle: const TextStyle(
+                        color: Colors.grey, // Gray out non-selectable dates
+                      ),
                     ),
-                    value: selectedDate != null ? [selectedDate!] : [],
+                    value: [selectedDate ?? today],
                     onValueChanged: (dates) {
-                      setState(() {
-                        selectedDate = dates.isNotEmpty ? dates.first : null;
-                      });
-                      checkIfLogExists(
-                        context,
-                      );
+                      handleDateSelection(
+                          context, dates.isNotEmpty ? dates.first : null);
                     },
                   ),
 
@@ -324,6 +318,10 @@ class _AddWeightLogScreenState extends ConsumerState<AddWeightLogScreen> {
                                     timeOfDay: selectedTimeOfDay!,
                                     loggedAt: loggedAt.toIso8601String(),
                                   );
+
+                              debugPrint(
+                                'Weight: $weight, Time of Day: $selectedTimeOfDay, Logged At: ${loggedAt.toIso8601String()}',
+                              );
 
                               ref.watch(weightLogControllerProvider).when(
                                 data: (_) {
