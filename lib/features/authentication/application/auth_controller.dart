@@ -67,7 +67,7 @@ class AuthController extends StateNotifier<AsyncValue<AuthApiResponse?>> {
       state = AsyncValue.data(res.data);
 
       // Save token or user details locally (e.g., in secure storage)
-      if (res.data!.token != null) {
+      if (res.data!.token != null && res.data!.user != null) {
         await secureStorage.storeAccessToken(res.data?.token ?? '');
       }
     } else if (err != null) {
