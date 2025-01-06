@@ -18,7 +18,7 @@ class WeightGoalSelectionModal extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.3,
+        maxHeight: MediaQuery.of(context).size.height * 0.34,
       ),
       child: Column(
         children: [

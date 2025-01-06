@@ -3,6 +3,7 @@ import 'package:daily_weight_logs_mobile/common/constants/images.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_app_bar.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_button.dart';
 import 'package:daily_weight_logs_mobile/common/widgets/weight_log_loading_dialog.dart';
+import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
 import 'package:daily_weight_logs_mobile/features/profile/application/controller/user_profile_controller.dart';
 import 'package:daily_weight_logs_mobile/features/profile/widgets/profile_field.dart';
 import 'package:daily_weight_logs_mobile/router/unauthenticated_routes.dart';
@@ -172,17 +173,38 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         final confirm = await showDialog<bool>(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: const Text('Delete Account'),
-                            content: const Text(
-                                'Are you sure you want to delete your account? This action cannot be undone.'),
+                            title: WeightLogText(
+                              text: 'Delete Account',
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red.withOpacity(0.6),
+                              textAlign: TextAlign.center,
+                            ),
+                            content: const WeightLogText(
+                              text:
+                                  'Are you sure you want to delete your account? This action cannot be undone.',
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black,
+                            ),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context, false),
-                                child: const Text('Cancel'),
+                                child: WeightLogText(
+                                  text: 'Cancel',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
                               ),
                               TextButton(
                                 onPressed: () => Navigator.pop(context, true),
-                                child: const Text('Delete'),
+                                child: WeightLogText(
+                                  text: 'Delete',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: grayTextColor,
+                                ),
                               ),
                             ],
                           ),
