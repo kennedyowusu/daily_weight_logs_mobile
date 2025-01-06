@@ -22,6 +22,19 @@ class UserProfileController extends StateNotifier<AsyncValue<UserProfile?>> {
       state = AsyncValue.error(err.message, StackTrace.current);
     }
   }
+
+  Future<void> deleteUserAccount() async {
+    state = const AsyncLoading(); // Reset state to loading while deleting
+
+    final (ApiSuccess<void>? res, ApiError? err) =
+        await repository.deleteUserProfile();
+
+    if (res != null) {
+      state = const AsyncValue.data(null); // User deleted, reset state
+    } else if (err != null) {
+      state = AsyncValue.error(err.message, StackTrace.current);
+    }
+  }
 }
 
 final userProfileControllerProvider =

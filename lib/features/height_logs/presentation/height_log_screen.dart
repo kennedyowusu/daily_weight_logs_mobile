@@ -107,191 +107,193 @@ class _HeightLogScreenState extends ConsumerState<HeightLogScreen> {
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: MediaQuery.sizeOf(context).height * 0.05),
-                Image.asset(
-                  weightLogoWhite,
-                  width: 150,
-                  height: 150,
-                ),
-                SizedBox(height: MediaQuery.sizeOf(context).height * 0.14),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: WeightLogText(
-                    text: 'Select Height Unit:',
-                    fontSize: 16,
-                    color: Colors.white,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: MediaQuery.sizeOf(context).height * 0.05),
+                  Image.asset(
+                    weightLogoWhite,
+                    width: 150,
+                    height: 150,
                   ),
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: RadioListTile<String>(
-                        title: const WeightLogText(
-                          text: 'm',
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
-                        value: 'meters',
-                        groupValue: selectedUnit,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedUnit = value!;
-                            heightController.clear();
-                          });
-                        },
-                      ),
+                  SizedBox(height: MediaQuery.sizeOf(context).height * 0.14),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: WeightLogText(
+                      text: 'Select Height Unit:',
+                      fontSize: 16,
+                      color: Colors.white,
                     ),
-                    Expanded(
-                      child: RadioListTile<String>(
-                        title: const WeightLogText(
-                          text: 'cm',
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
-                        value: 'centimeters',
-                        groupValue: selectedUnit,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedUnit = value!;
-                            heightController.clear();
-                          });
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: RadioListTile<String>(
-                        title: const WeightLogText(
-                          text: 'ft/in',
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
-                        value: 'feet/inches',
-                        groupValue: selectedUnit,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedUnit = value!;
-                            heightController.clear();
-                          });
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                WeightLogInputField(
-                  controller: heightController,
-                  hintText: selectedUnit == 'meters'
-                      ? 'Enter height in meters'
-                      : selectedUnit == 'centimeters'
-                          ? 'Enter height in centimeters'
-                          : 'Enter height in feet.inches',
-                  labelText:
-                      'Height (${selectedUnit == "feet/inches" ? "ft.in" : selectedUnit})',
-                  inputTextColor: Colors.white,
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.done,
-                ),
-                const SizedBox(height: 20),
-                DropdownButtonHideUnderline(
-                  child: GestureDetector(
-                    onTap: () {
-                      _showWeightGoalSelection(context);
-                    },
-                    child: InputDecorator(
-                      decoration: InputDecoration(
-                        labelText: 'Weight Goal',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 12,
-                          horizontal: 16,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          WeightLogText(
-                            text: selectedWeightGoal ?? 'Select Weight Goal',
-                            fontSize: 16,
-                            color: selectedWeightGoal == null
-                                ? grayTextColor
-                                : Colors.white,
-                          ),
-                          const Icon(
-                            Icons.arrow_drop_down,
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: RadioListTile<String>(
+                          title: const WeightLogText(
+                            text: 'm',
+                            fontSize: 14,
                             color: Colors.white,
                           ),
-                        ],
+                          value: 'meters',
+                          groupValue: selectedUnit,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedUnit = value!;
+                              heightController.clear();
+                            });
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: RadioListTile<String>(
+                          title: const WeightLogText(
+                            text: 'cm',
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                          value: 'centimeters',
+                          groupValue: selectedUnit,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedUnit = value!;
+                              heightController.clear();
+                            });
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: RadioListTile<String>(
+                          title: const WeightLogText(
+                            text: 'ft/in',
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                          value: 'feet/inches',
+                          groupValue: selectedUnit,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedUnit = value!;
+                              heightController.clear();
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  WeightLogInputField(
+                    controller: heightController,
+                    hintText: selectedUnit == 'meters'
+                        ? 'Enter height in meters'
+                        : selectedUnit == 'centimeters'
+                            ? 'Enter height in centimeters'
+                            : 'Enter height in feet.inches',
+                    labelText:
+                        'Height (${selectedUnit == "feet/inches" ? "ft.in" : selectedUnit})',
+                    inputTextColor: Colors.white,
+                    keyboardType: TextInputType.number,
+                    textInputAction: TextInputAction.done,
+                  ),
+                  const SizedBox(height: 20),
+                  DropdownButtonHideUnderline(
+                    child: GestureDetector(
+                      onTap: () {
+                        _showWeightGoalSelection(context);
+                      },
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          labelText: 'Weight Goal',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 16,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            WeightLogText(
+                              text: selectedWeightGoal ?? 'Select Weight Goal',
+                              fontSize: 16,
+                              color: selectedWeightGoal == null
+                                  ? grayTextColor
+                                  : Colors.white,
+                            ),
+                            const Icon(
+                              Icons.arrow_drop_down,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 24),
-                WeightLogButton(
-                  text: 'Submit Height Goal',
-                  buttonTextColor: secondaryColor,
-                  buttonBackgroundColor: primaryColor,
-                  onPressed: () async {
-                    _convertHeightIfNeeded();
-                    if (formKey.currentState?.validate() == true &&
-                        selectedWeightGoal != null) {
-                      final height =
-                          double.tryParse(heightController.text.trim());
-                      if (height == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Invalid height value.')),
-                        );
-                        return;
-                      }
-
-                      // Show loading dialog
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        barrierColor: Colors.black.withOpacity(0.5),
-                        builder: (BuildContext context) {
-                          return const WeightLogLoadingDialog(
-                              message: 'Submitting...');
-                        },
-                      );
-
-                      await ref
-                          .read(heightLogControllerProvider.notifier)
-                          .saveHeightLog(
-                            height.toStringAsFixed(2),
-                            selectedWeightGoal?.toLowerCase() ?? '',
-                          );
-
-                      heightLogState.when(
-                        data: (_) {
-                          Navigator.of(context).pop();
-                          Navigator.pushReplacementNamed(
-                            context,
-                            MainRoutes.weightLogRoute,
-                          );
-                        },
-                        error: (error, _) {
-                          Navigator.of(context).pop();
+                  const SizedBox(height: 24),
+                  WeightLogButton(
+                    text: 'Submit Height Goal',
+                    buttonTextColor: secondaryColor,
+                    buttonBackgroundColor: primaryColor,
+                    onPressed: () async {
+                      _convertHeightIfNeeded();
+                      if (formKey.currentState?.validate() == true &&
+                          selectedWeightGoal != null) {
+                        final height =
+                            double.tryParse(heightController.text.trim());
+                        if (height == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(error.toString())),
+                            const SnackBar(
+                                content: Text('Invalid height value.')),
                           );
-                        },
-                        loading: () {
-                          // Already handled by dialog
-                        },
-                      );
-                    }
-                  },
-                ),
-              ],
+                          return;
+                        }
+
+                        // Show loading dialog
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          barrierColor: Colors.black.withOpacity(0.5),
+                          builder: (BuildContext context) {
+                            return const WeightLogLoadingDialog(
+                                message: 'Submitting...');
+                          },
+                        );
+
+                        await ref
+                            .read(heightLogControllerProvider.notifier)
+                            .saveHeightLog(
+                              height.toStringAsFixed(2),
+                              selectedWeightGoal?.toLowerCase() ?? '',
+                            );
+
+                        heightLogState.when(
+                          data: (_) {
+                            Navigator.of(context).pop();
+                            Navigator.pushReplacementNamed(
+                              context,
+                              MainRoutes.weightLogRoute,
+                            );
+                          },
+                          error: (error, _) {
+                            Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(error.toString())),
+                            );
+                          },
+                          loading: () {
+                            // Already handled by dialog
+                          },
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -192,7 +192,7 @@ class RegisterForm extends ConsumerWidget {
                     color: secondaryColor,
                   ),
                   const WeightLogText(
-                    text: ' and ',
+                    text: ' & ',
                     color: grayTextColor,
                   ),
                   WeightLogText(

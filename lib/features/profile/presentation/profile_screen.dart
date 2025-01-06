@@ -156,11 +156,62 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       text: 'Logout from Account',
                     ),
                   ),
+
+                  const SizedBox(height: 16),
+
+                  // Delete Account Button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: WeightLogButton(
+                      buttonBackgroundColor: Colors.red,
+                      buttonTextColor: Colors.white,
+                      buttonTextFontWeight: FontWeight.bold,
+                      isEnabled: true,
+                      onPressed: () async {
+                        // Show confirmation dialog
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Delete Account'),
+                            content: const Text(
+                                'Are you sure you want to delete your account? This action cannot be undone.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text('Delete'),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (confirm == true) {
+                          // Call the delete account method
+                          await ref
+                              .read(userProfileControllerProvider.notifier)
+                              .deleteUserAccount();
+
+                          // Redirect to login screen
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            InitialRoutes.loginRoute,
+                            (route) => false, // Remove all previous routes
+                          );
+                        }
+                      },
+                      text: 'Delete Account',
+                    ),
+                  ),
                 ],
               ),
             ),
           );
         },
+        // Loading state
+
         loading: () => const Center(
           child: CircularProgressIndicator(color: primaryColor),
         ),

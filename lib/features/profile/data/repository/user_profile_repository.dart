@@ -43,6 +43,40 @@ class UserProfileRepository {
       );
     }
   }
+
+  // Delete user profile
+  Future<(ApiSuccess<void>?, ApiError?)> deleteUserProfile() async {
+    try {
+      final response = await APIService.delete(url: profile);
+
+      if (response.statusCode == 200) {
+        return (
+          ApiSuccess<void>(
+            statusCode: response.statusCode ?? 0,
+            data: null,
+          ),
+          null
+        );
+      } else {
+        return (
+          null,
+          ApiError(
+            statusCode: response.statusCode ?? 0,
+            message: errorParser(response.data),
+          )
+        );
+      }
+    } catch (e) {
+      debugPrint('Error deleting user profile: $e');
+      return (
+        null,
+        ApiError(
+          statusCode: 500,
+          message: 'Error deleting user profile, $e',
+        )
+      );
+    }
+  }
 }
 
 final userProfileRepositoryProvider = Provider<UserProfileRepository>(
