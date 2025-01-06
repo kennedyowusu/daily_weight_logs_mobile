@@ -7,6 +7,7 @@ import 'package:daily_weight_logs_mobile/common/widgets/weight_log_text.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/application/auth_controller.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/widgets/weight_log_button_text.dart';
 import 'package:daily_weight_logs_mobile/features/authentication/widgets/weight_log_input_field.dart';
+import 'package:daily_weight_logs_mobile/features/height_logs/application/controllers/height_log_controller.dart';
 import 'package:daily_weight_logs_mobile/router/unauthenticated_routes.dart';
 import 'package:daily_weight_logs_mobile/router/authenticated_routes.dart';
 import 'package:flutter/material.dart';
@@ -153,12 +154,28 @@ class LoginFormState extends ConsumerState<LoginForm> {
                     await DailyWeightLogsSecureStorage()
                         .storeAccessToken(authResponse!.token!);
 
+                    // Fetch the user's health data
+                    final heightLog = await ref
+                        .read(heightLogControllerProvider.notifier)
+                        .repository
+                        .getHealthDataByUserId(
+                            authResponse.user!.id!.toString());
+
                     // Navigate to the WeightLogScreen
                     if (context.mounted) {
-                      Navigator.pushReplacementNamed(
-                        context,
-                        MainRoutes.heightLogRoute,
-                      );
+                      if (heightLog == null) {
+                        // Navigate to the Health Data Screen
+                        Navigator.pushReplacementNamed(
+                          context,
+                          MainRoutes.heightLogRoute,
+                        );
+                      } else {
+                        // Navigate to the Weight Log Screen
+                        Navigator.pushReplacementNamed(
+                          context,
+                          MainRoutes.weightLogRoute,
+                        );
+                      }
                     }
                   } else {
                     // Show error message if login fails
