@@ -186,9 +186,11 @@ class RegisterForm extends ConsumerWidget {
                   const WeightLogText(
                     text: 'I agree to the ',
                     color: grayTextColor,
+                    fontSize: 12,
                   ),
                   WeightLogText(
                     text: 'Terms of Service',
+                    fontSize: 12,
                     color: secondaryColor,
                   ),
                   const WeightLogText(
@@ -198,6 +200,7 @@ class RegisterForm extends ConsumerWidget {
                   WeightLogText(
                     text: 'Privacy Policy',
                     color: secondaryColor,
+                    fontSize: 12,
                   ),
                 ],
               ),
