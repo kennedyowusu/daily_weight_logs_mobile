@@ -34,9 +34,12 @@ class HeightLogRepository {
     debugPrint('Saving height log to: $healthLogUrl');
     try {
       final response = await APIService.post(
-        url: healthLogUrl,
+        url: 'https://weightlogapi.kennedyowusu.com/api/v1/health-data',
+        // baseUrl + createHealthDataUrl,
         body: heightLog.toJson(),
       );
+
+      debugPrint('Response health data log: ${response.data}');
 
       if (response.statusCode == 201) {
         final apiResponse = HeightLogApiResponse.fromJson(response.data);

@@ -154,10 +154,10 @@ class LoginFormState extends ConsumerState<LoginForm> {
                         .storeAccessToken(authResponse!.token!);
 
                     // Navigate to the WeightLogScreen
-                    if (mounted) {
+                    if (context.mounted) {
                       Navigator.pushReplacementNamed(
                         context,
-                        MainRoutes.weightLogRoute,
+                        MainRoutes.heightLogRoute,
                       );
                     }
                   } else {
