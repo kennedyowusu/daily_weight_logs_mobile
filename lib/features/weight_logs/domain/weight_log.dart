@@ -28,7 +28,7 @@ class WeightLogModel {
   final int? weight;
   final String? timeOfDay;
   final String? loggedAt;
-  final int? bmi;
+  final double? bmi;
   final UserId? userId;
 
   WeightLogModel({
@@ -50,7 +50,7 @@ class WeightLogModel {
         weight: json["weight"],
         timeOfDay: json["time_of_day"],
         loggedAt: json["logged_at"],
-        bmi: json["bmi"],
+        bmi: json["bmi"]?.toDouble(),
         userId:
             json["user_id"] == null ? null : UserId.fromJson(json["user_id"]),
       );
