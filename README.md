@@ -103,5 +103,5 @@ License
 
 This project is licensed under the MIT License.
 
-https://github.com/kennedyowusu/daily_weight_logs_mobile/blob/main/LICENSE
+[LICENSE](https://github.com/kennedyowusu/daily_weight_logs_mobile/blob/main/LICENSE)
 
